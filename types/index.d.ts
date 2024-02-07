@@ -8,5 +8,9 @@ declare namespace NodeJS {
     TZ: string;
     NODE_ENV: string;
     SERVER_PORT: number;
+    MONGODB_HOST: string;
+    MONGODB_DBNAME: string;
+    MONGODB_USER: string;
+    MONGODB_PASSWORD: string;
   }
 }

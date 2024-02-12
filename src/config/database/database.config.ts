@@ -2,7 +2,7 @@ import { DynamicModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import 'dotenv/config';
 
-const MongooseConfig: DynamicModule = MongooseModule.forRoot(
+export const MongooseConfig: DynamicModule = MongooseModule.forRoot(
   process.env.MONGODB_HOST,
   {
     dbName: process.env.MONGODB_NAME,
@@ -10,5 +10,3 @@ const MongooseConfig: DynamicModule = MongooseModule.forRoot(
     pass: process.env.MONGODB_PASSWORD,
   },
 );
-
-export default MongooseConfig;

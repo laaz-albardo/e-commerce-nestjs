@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { User } from '../schemas';
 
-export type UserDocument = User & Document;
+export type UserDocument = HydratedDocument<User>;

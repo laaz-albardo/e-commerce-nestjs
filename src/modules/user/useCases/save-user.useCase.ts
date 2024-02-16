@@ -18,10 +18,7 @@ export class SaveUserUseCase {
       });
 
       if (validateUserEmail) {
-        throw new ConflictException({
-          message: `${validateUserEmail.email} registered`,
-          error: 409,
-        });
+        throw new ConflictException(`${validateUserEmail.email} registered`);
       }
 
       let user = await this.repository.create(data);

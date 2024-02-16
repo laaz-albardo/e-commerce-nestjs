@@ -9,9 +9,10 @@ import { Connection } from 'mongoose';
 import { UserModule } from '../user.module';
 import { isInt } from 'class-validator';
 
-describe('UserService', () => {
+describe('Start User Test', () => {
   let app: INestApplication;
-  let apiClient = null;
+  let connection: Connection;
+  let apiClient: supertest.Agent = null;
   const path = '/user';
   const testPort = isInt(Number(process.env.SERVER_TEST_PORT))
     ? process.env.SERVER_TEST_PORT
@@ -26,6 +27,7 @@ describe('UserService', () => {
       ],
     }).compile();
 
+    connection = await module.get(getConnectionToken());
     app = module.createNestApplication();
     await app.listen(testPort);
     await app.init();
@@ -34,13 +36,14 @@ describe('UserService', () => {
   });
 
   afterAll(async () => {
-    await (app.get(getConnectionToken()) as Connection).db.dropDatabase();
+    await connection.dropDatabase();
+    await connection.close();
     await app.close();
   });
 
-  describe('Saver User Use Case Test', () => {
+  describe('Save User Use Case', () => {
     describe('Save User Success', () => {
-      it('Create User', async () => {
+      test('Create User', async () => {
         const payload: IUser = {
           email: 'test@test.com',
           password: '1234567890',
@@ -57,11 +60,12 @@ describe('UserService', () => {
           .send(<IUser>payload);
 
         expect(response.statusCode).toStrictEqual(201);
+        expect(response.body).toBeDefined();
       });
     });
 
     describe('Save User Error', () => {
-      it('Should throw an error if user email exist', async () => {
+      test('Should throw an error if user email exist', async () => {
         const payload: IUser = {
           email: 'test@test.com',
           password: '1234567890',
@@ -78,6 +82,20 @@ describe('UserService', () => {
           .send(<IUser>payload);
 
         expect(response.statusCode).toStrictEqual(409);
+      });
+    });
+  });
+
+  describe('List Users Use Case', () => {
+    describe('List Users Success', () => {
+      test('List Users', async () => {
+        const response = await apiClient
+          .get(path)
+          .set('Accept', 'application/json')
+          .send();
+
+        expect(response.statusCode).toStrictEqual(200);
+        expect(response.body).toBeInstanceOf(Array<User>);
       });
     });
   });

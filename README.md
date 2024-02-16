@@ -23,8 +23,10 @@ crear archivo .env en la ruta raiz del sistema y configurar las siguiente variab
 SERVER_PORT=8000
 
 # Sincronize true only with MongoDB
-MONGODB_HOST=url/port
+MONGODB_HOST=url
+MONGODB_PORT=port
 MONGODB_DBNAME=dbname
+MONGODB_DBTEST=dbtest
 MONGODB_USER=username
 MONGODB_PASSWORD=password
 ```

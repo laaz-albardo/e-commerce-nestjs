@@ -1,10 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from './dto';
+import { SaveUserUseCase } from './useCases';
+import { UserTransformer } from './transformers';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private readonly saveUserUseCase: SaveUserUseCase) {}
+
+  async create(createUserDto: CreateUserDto) {
+    let data = await this.saveUserUseCase.saveUser(createUserDto);
+
+    data = await new UserTransformer().handle(data);
+
+    return data;
   }
 
   findAll() {

@@ -3,8 +3,14 @@ import { IPerson, IUser } from '../interfaces';
 import { PersonSchema } from './person.schema';
 
 @Schema({ timestamps: true })
-export class User implements IUser {
-  @Prop({ type: String, length: 50, required: true })
+export class User implements Partial<IUser> {
+  @Prop({
+    type: String,
+    length: 50,
+    required: true,
+    unique: true,
+    lowercase: true,
+  })
   email: string;
 
   @Prop({ type: String, length: 50, required: true })

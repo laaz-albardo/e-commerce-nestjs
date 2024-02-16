@@ -1,4 +1,4 @@
-import { Transformer } from 'src/shared';
+import { Transformer } from '@src/shared';
 import { IUser } from '../interfaces';
 import { PersonTransformer } from './person.transformer';
 

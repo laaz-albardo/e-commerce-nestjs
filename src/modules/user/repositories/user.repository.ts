@@ -1,4 +1,4 @@
-import { BaseMongoDbRepository } from 'src/shared';
+import { BaseMongoDbRepository } from '@src/shared';
 import { User } from '../schemas';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';

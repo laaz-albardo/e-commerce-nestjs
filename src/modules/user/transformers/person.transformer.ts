@@ -1,4 +1,4 @@
-import { Transformer } from 'src/shared';
+import { Transformer } from '@src/shared';
 import { IPerson } from '../interfaces';
 
 export class PersonTransformer extends Transformer {

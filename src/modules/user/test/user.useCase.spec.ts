@@ -8,15 +8,18 @@ import { INestApplication } from '@nestjs/common';
 import { Connection } from 'mongoose';
 import { UserModule } from '../user.module';
 import { isInt } from 'class-validator';
+import { Types } from 'mongoose';
 
 describe('Start User Test', () => {
   let app: INestApplication;
   let connection: Connection;
   let apiClient: supertest.Agent = null;
-  const path = '/user';
   const testPort = isInt(Number(process.env.SERVER_TEST_PORT))
     ? process.env.SERVER_TEST_PORT
     : 8080;
+
+  const path = '/user';
+  let userId = null;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -41,62 +44,90 @@ describe('Start User Test', () => {
     await app.close();
   });
 
-  describe('Save User Use Case', () => {
-    describe('Save User Success', () => {
-      test('Create User', async () => {
-        const payload: IUser = {
-          email: 'test@test.com',
-          password: '1234567890',
-          person: {
-            fullName: 'test test',
-            codePostal: '6101',
-            country: 'venezuela',
-          },
-        };
+  describe('User Use Case', () => {
+    test('Create User', async () => {
+      const payload: IUser = {
+        email: 'test@test.com',
+        password: '1234567890',
+        person: {
+          fullName: 'test test',
+          codePostal: '6101',
+          country: 'venezuela',
+        },
+      };
 
-        const response = await apiClient
-          .post(path)
-          .set('Accept', 'application/json')
-          .send(<IUser>payload);
+      const response = await apiClient
+        .post(path)
+        .set('Accept', 'application/json')
+        .send(<IUser>payload);
 
-        expect(response.statusCode).toStrictEqual(201);
-        expect(response.body).toBeDefined();
-      });
+      expect(response.statusCode).toStrictEqual(201);
+      expect(response.body).toBeDefined();
+
+      userId = response.body._id;
     });
 
-    describe('Save User Error', () => {
-      test('Should throw an error if user email exist', async () => {
-        const payload: IUser = {
-          email: 'test@test.com',
-          password: '1234567890',
-          person: {
-            fullName: 'test test',
-            codePostal: '6101',
-            country: 'venezuela',
-          },
-        };
+    test('List Users', async () => {
+      const response = await apiClient
+        .get(path)
+        .set('Accept', 'application/json')
+        .send();
 
-        const response = await apiClient
-          .post(path)
-          .set('Accept', 'application/json')
-          .send(<IUser>payload);
+      expect(response.statusCode).toStrictEqual(200);
+      expect(response.body).toBeInstanceOf(Array<User>);
+    });
 
-        expect(response.statusCode).toStrictEqual(409);
-      });
+    test(`Get User By Id`, async () => {
+      const response = await apiClient
+        .get(`${path}/${userId}`)
+        .set('Accept', 'application/json')
+        .send();
+
+      expect(response.statusCode).toStrictEqual(200);
+      expect(response.body).toBeDefined();
     });
   });
 
-  describe('List Users Use Case', () => {
-    describe('List Users Success', () => {
-      test('List Users', async () => {
-        const response = await apiClient
-          .get(path)
-          .set('Accept', 'application/json')
-          .send();
+  describe('User Use Case Error', () => {
+    test('Save User -> Should throw an error if user email exist', async () => {
+      const payload: IUser = {
+        email: 'test@test.com',
+        password: '1234567890',
+        person: {
+          fullName: 'test test',
+          codePostal: '6101',
+          country: 'venezuela',
+        },
+      };
 
-        expect(response.statusCode).toStrictEqual(200);
-        expect(response.body).toBeInstanceOf(Array<User>);
-      });
+      const response = await apiClient
+        .post(path)
+        .set('Accept', 'application/json')
+        .send(<IUser>payload);
+
+      expect(response.statusCode).toStrictEqual(409);
+    });
+
+    test(`Get User By Id -> Should throw an error if user Id is invalid`, async () => {
+      userId = 248;
+
+      const response = await apiClient
+        .get(`${path}/${userId}`)
+        .set('Accept', 'application/json')
+        .send();
+
+      expect(response.statusCode).toStrictEqual(400);
+    });
+
+    test(`Get User By Id -> Should throw an error if user Id don't exist`, async () => {
+      userId = new Types.ObjectId();
+
+      const response = await apiClient
+        .get(`${path}/${userId}`)
+        .set('Accept', 'application/json')
+        .send();
+
+      expect(response.statusCode).toStrictEqual(404);
     });
   });
 });

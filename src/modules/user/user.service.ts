@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { GetUserUseCase, ListUsersUseCase, SaveUserUseCase } from './useCases';
+import {
+  DeleteUserUseCase,
+  GetUserUseCase,
+  ListUsersUseCase,
+  SaveUserUseCase,
+  UpdateUserUseCase,
+} from './useCases';
 import { UserTransformer } from './transformers';
-import { DeleteUserUseCase } from './useCases/delete-user.useCase';
 
 @Injectable()
 export class UserService {
@@ -10,6 +15,7 @@ export class UserService {
     private readonly saveUserUseCase: SaveUserUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
     private readonly getUserUseCase: GetUserUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
   ) {}
 
@@ -37,8 +43,12 @@ export class UserService {
     return data;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(_id: string, updateUserDto: UpdateUserDto) {
+    let data = await this.updateUserUseCase.updateUser(_id, updateUserDto);
+
+    data = await new UserTransformer().handle(data);
+
+    return data;
   }
 
   async remove(_id: string) {

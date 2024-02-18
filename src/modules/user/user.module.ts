@@ -5,6 +5,7 @@ import { UserService } from './user.service';
 import { User, UserShema } from './schemas';
 import { UserRepository } from './repositories';
 import { GetUserUseCase, ListUsersUseCase, SaveUserUseCase } from './useCases';
+import { DeleteUserUseCase } from './useCases/delete-user.useCase';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { GetUserUseCase, ListUsersUseCase, SaveUserUseCase } from './useCases';
     SaveUserUseCase,
     UserRepository,
     UserService,
+    DeleteUserUseCase,
   ],
   exports: [UserRepository],
 })

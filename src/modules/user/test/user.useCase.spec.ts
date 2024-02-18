@@ -77,13 +77,23 @@ describe('Start User Test', () => {
       expect(response.body).toBeInstanceOf(Array<User>);
     });
 
-    test(`Get User By Id`, async () => {
+    test('Get User By Id', async () => {
       const response = await apiClient
         .get(`${path}/${userId}`)
         .set('Accept', 'application/json')
         .send();
 
       expect(response.statusCode).toStrictEqual(200);
+      expect(response.body).toBeDefined();
+    });
+
+    test('Delete User By Id', async () => {
+      const response = await apiClient
+        .delete(`${path}/${userId}`)
+        .set('Accept', 'application/json')
+        .send();
+
+      expect(response.statusCode).toStrictEqual(202);
       expect(response.body).toBeDefined();
     });
   });
@@ -99,6 +109,11 @@ describe('Start User Test', () => {
           country: 'venezuela',
         },
       };
+
+      await apiClient
+        .post(path)
+        .set('Accept', 'application/json')
+        .send(<IUser>payload);
 
       const response = await apiClient
         .post(path)
@@ -124,6 +139,28 @@ describe('Start User Test', () => {
 
       const response = await apiClient
         .get(`${path}/${userId}`)
+        .set('Accept', 'application/json')
+        .send();
+
+      expect(response.statusCode).toStrictEqual(404);
+    });
+
+    test(`Delete User By Id -> Should throw an error if user Id is invalid`, async () => {
+      userId = 248;
+
+      const response = await apiClient
+        .delete(`${path}/${userId}`)
+        .set('Accept', 'application/json')
+        .send();
+
+      expect(response.statusCode).toStrictEqual(400);
+    });
+
+    test(`Delete User By Id -> Should throw an error if user Id don't exist`, async () => {
+      userId = new Types.ObjectId();
+
+      const response = await apiClient
+        .delete(`${path}/${userId}`)
         .set('Accept', 'application/json')
         .send();
 

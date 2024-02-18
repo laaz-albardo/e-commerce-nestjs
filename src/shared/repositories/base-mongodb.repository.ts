@@ -31,13 +31,13 @@ export abstract class BaseMongoDbRepository<T>
 
   async update(_id: string, data: T): Promise<T> {
     return await this.repository
-      .findOneAndUpdate({ where: { _id } }, data, {
+      .findOneAndUpdate({ _id }, data, {
         new: true,
       })
       .exec();
   }
 
   async delete(_id: string): Promise<T> {
-    return await this.repository.findOneAndDelete({ where: { _id } }).exec();
+    return await this.repository.findOneAndDelete({ _id }).exec();
   }
 }

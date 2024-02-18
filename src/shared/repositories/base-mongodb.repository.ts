@@ -19,10 +19,7 @@ export abstract class BaseMongoDbRepository<T>
     const entity = await this.repository.findById(_id).exec();
 
     if (!entity) {
-      throw new NotFoundException({
-        message: `${this.entityName} not found`,
-        status: 404,
-      });
+      throw new NotFoundException(`${this.entityName} not found`);
     }
 
     return entity;

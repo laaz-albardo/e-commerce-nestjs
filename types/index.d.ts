@@ -15,5 +15,7 @@ declare namespace NodeJS {
     MONGODB_DBTEST: string;
     MONGODB_USER: string;
     MONGODB_PASSWORD: string;
+    JWT_SECRET: string;
+    JWT_EXPIRES: number;
   }
 }

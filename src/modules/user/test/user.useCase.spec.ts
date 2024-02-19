@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
-import { User, UserShema } from '../schemas';
+import { getConnectionToken } from '@nestjs/mongoose';
+import { User } from '../schemas';
 import { MongooseConfigTest } from '@src/config';
 import * as supertest from 'supertest';
 import { IUser } from '../interfaces';
@@ -23,11 +23,7 @@ describe('Start User Test', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        MongooseConfigTest,
-        MongooseModule.forFeature([{ name: User.name, schema: UserShema }]),
-        UserModule,
-      ],
+      imports: [MongooseConfigTest, UserModule],
     }).compile();
 
     connection = await module.get(getConnectionToken());

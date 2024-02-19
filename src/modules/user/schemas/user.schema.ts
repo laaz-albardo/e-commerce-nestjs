@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IPerson, IUser } from '../interfaces';
 import { PersonSchema } from './person.schema';
+import { genSalt, hash } from 'bcrypt';
 
 @Schema({ timestamps: true })
 export class User implements Partial<IUser> {
@@ -20,4 +21,13 @@ export class User implements Partial<IUser> {
   person: IPerson;
 }
 
-export const UserShema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    const salt = await genSalt();
+    this.password = await hash(this.password, salt);
+  }
+
+  next();
+});

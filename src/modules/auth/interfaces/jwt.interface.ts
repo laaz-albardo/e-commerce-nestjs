@@ -1,8 +1,7 @@
 import { ObjectId } from 'mongoose';
 
-export interface IBase {
+export interface IJWTPayload {
   _id: ObjectId | string;
+  email: string;
   createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date | null;
 }

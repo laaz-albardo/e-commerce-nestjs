@@ -4,6 +4,7 @@ import { GetUserUseCase } from './get-user.useCase';
 import { UpdateUserDto } from '../dto';
 import { UserDocument } from '../types';
 import { User } from '../schemas';
+import { CustomErrorException } from '@src/shared';
 
 @Injectable()
 export class UpdateUserUseCase {
@@ -39,7 +40,7 @@ export class UpdateUserUseCase {
 
       return updateUser;
     } catch (err) {
-      throw err;
+      throw new CustomErrorException(err);
     }
   }
 }

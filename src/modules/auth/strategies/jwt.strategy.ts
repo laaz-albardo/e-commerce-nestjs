@@ -1,11 +1,14 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { GetUserUseCase } from '@src/modules/user';
 import { IJWTPayload } from '../interfaces';
+import { CustomErrorException } from '@src/shared';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
+
   constructor(private readonly getUserUseCase: GetUserUseCase) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -15,10 +18,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: IJWTPayload) {
-    const user = await this.getUserUseCase.getUserById(payload._id as string);
+    try {
+      this.logger.log('auth user...');
 
-    if (!user) throw new UnauthorizedException();
+      const user = await this.getUserUseCase.getUserById(payload._id as string);
 
-    return user;
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+
+      this.logger.log('auth successfully');
+      return user;
+    } catch (err) {
+      throw new CustomErrorException(err);
+    }
   }
 }

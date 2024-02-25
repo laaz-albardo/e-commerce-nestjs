@@ -2,6 +2,7 @@ import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from '../repositories';
 import { CreateUserDto } from '../dto';
 import { User } from '../schemas';
+import { CustomErrorException } from '@src/shared';
 
 @Injectable()
 export class SaveUserUseCase {
@@ -29,7 +30,7 @@ export class SaveUserUseCase {
 
       return user;
     } catch (err) {
-      throw err;
+      throw new CustomErrorException(err);
     }
   }
 }

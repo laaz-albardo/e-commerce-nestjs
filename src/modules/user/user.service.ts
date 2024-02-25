@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import {
   DeleteUserUseCase,
@@ -8,9 +8,12 @@ import {
   UpdateUserUseCase,
 } from './useCases';
 import { UserTransformer } from './transformers';
+import { BaseResponse } from '@src/shared';
 
 @Injectable()
 export class UserService {
+  private readonly response: BaseResponse = new BaseResponse();
+
   constructor(
     private readonly saveUserUseCase: SaveUserUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
@@ -20,45 +23,32 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    let data = await this.saveUserUseCase.saveUser(createUserDto);
+    const data = await this.saveUserUseCase.saveUser(createUserDto);
 
-    data = await new UserTransformer().handle(data);
-
-    return data;
+    return this.response.send(data, HttpStatus.CREATED, new UserTransformer());
   }
 
   async findAll() {
-    let data = await this.listUsersUseCase.listUsers();
+    const data = await this.listUsersUseCase.listUsers();
 
-    data = await new UserTransformer().handle(data);
-
-    return data;
+    return this.response.send(data, HttpStatus.OK, new UserTransformer());
   }
 
   async findOneById(_id: string) {
-    let data = await this.getUserUseCase.getUserById(_id);
+    const data = await this.getUserUseCase.getUserById(_id);
 
-    data = await new UserTransformer().handle(data);
-
-    return data;
+    return this.response.send(data, HttpStatus.OK, new UserTransformer());
   }
 
   async update(_id: string, updateUserDto: UpdateUserDto) {
-    let data = await this.updateUserUseCase.updateUser(_id, updateUserDto);
+    const data = await this.updateUserUseCase.updateUser(_id, updateUserDto);
 
-    data = await new UserTransformer().handle(data);
-
-    return data;
+    return this.response.send(data, HttpStatus.ACCEPTED, new UserTransformer());
   }
 
   async remove(_id: string) {
-    let data = await this.deleteUserUseCase.deleteUser(_id);
+    const data = await this.deleteUserUseCase.deleteUser(_id);
 
-    data = await new UserTransformer().handle(data);
-
-    return {
-      message: 'User deleted',
-      data,
-    };
+    return this.response.send(data, HttpStatus.ACCEPTED, new UserTransformer());
   }
 }

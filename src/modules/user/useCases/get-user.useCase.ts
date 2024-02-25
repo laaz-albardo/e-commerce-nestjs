@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from '../repositories';
 import { User } from '../schemas';
 import { Types } from 'mongoose';
+import { CustomErrorException } from '@src/shared';
 
 @Injectable()
 export class GetUserUseCase {
@@ -25,7 +26,7 @@ export class GetUserUseCase {
 
       return user;
     } catch (err) {
-      throw err;
+      throw new CustomErrorException(err);
     }
   }
 }

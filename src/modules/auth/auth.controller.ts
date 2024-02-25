@@ -7,12 +7,14 @@ import {
   Res,
   Req,
   HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { IUser } from '../user';
-import { JwtAuthGuard, LocalAuthGuard } from './guards';
-import { AuthInterceptor, LoginInterceptor } from './transformers';
+import { LocalAuthGuard } from './guards';
+import { AuthInterceptor, LoginInterceptor } from './interceptors';
+import { AuthAll } from './decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -21,23 +23,21 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @UseInterceptors(LoginInterceptor)
   @Post('login')
-  @HttpCode(201)
+  @HttpCode(HttpStatus.CREATED)
   login(@Req() req: Request) {
     return this.authService.login(req.user);
   }
 
-  // @AuthAll()
-  @UseGuards(JwtAuthGuard)
+  @AuthAll()
   @Post('logout')
-  @HttpCode(202)
+  @HttpCode(HttpStatus.ACCEPTED)
   singOut(@Res() res: Response) {
     res.send({ statusCode: res.statusCode, data: { token: '' } });
   }
 
-  // @AuthAll()
-  @UseGuards(JwtAuthGuard)
+  @AuthAll()
   @UseInterceptors(AuthInterceptor)
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @Get('me')
   profile(@Req() req: Request) {
     return this.authService.profile(req.user as IUser);

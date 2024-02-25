@@ -7,3 +7,6 @@ export * from './auth.service';
 export * from './jwt/jwt.token';
 export * from './useCases';
 export * from './jwt';
+export * from './keys';
+export * from './decorators';
+export * from './interceptors';

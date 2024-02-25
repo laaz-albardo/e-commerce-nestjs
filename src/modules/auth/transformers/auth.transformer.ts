@@ -14,7 +14,7 @@ export class AuthTransformer extends Transformer {
     const user = await this.validate(token.getUser(), this.userTransformer);
 
     return {
-      ...user,
+      user,
       token: token.getHash(),
     };
   }

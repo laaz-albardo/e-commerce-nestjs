@@ -14,6 +14,7 @@ export class UserTransformer extends Transformer {
     return {
       _id: user._id,
       email: user.email,
+      role: user.role,
       person: await this.validate(user.person, this.personTransformer),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,

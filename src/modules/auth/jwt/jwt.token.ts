@@ -15,6 +15,7 @@ export class JWTToken implements IToken {
     this.payload = {
       _id: user._id,
       email: user.email,
+      role: user.role,
       createdAt: user.createdAt,
     };
 

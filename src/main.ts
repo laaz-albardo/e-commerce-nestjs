@@ -2,12 +2,26 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { ClassValidatorConfig } from './config';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+    {
+      cors: true,
+    },
+  );
 
   // Global prefix
   app.setGlobalPrefix('api');
+
+  // use validators containers
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   // Validations
   app.useGlobalPipes(ClassValidatorConfig);

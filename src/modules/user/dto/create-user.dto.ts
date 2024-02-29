@@ -8,13 +8,14 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { CreatePersonDto } from './create-person.dto';
 import { UserRoleEnum } from '../enums';
 
 export class CreateUserDto implements Partial<IUser> {
   @IsEmail()
   @MaxLength(50)
+  @Transform(({ value }) => value.toLowerCase())
   email: string;
 
   @IsString()
@@ -32,6 +33,7 @@ export class CreateUserDto implements Partial<IUser> {
   password: string;
 
   @IsEnum(UserRoleEnum)
+  @Transform(({ value }) => value.toUpperCase())
   role: UserRoleEnum;
 
   @ValidateNested()

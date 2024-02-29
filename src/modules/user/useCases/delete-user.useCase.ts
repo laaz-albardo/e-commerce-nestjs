@@ -20,7 +20,7 @@ export class DeleteUserUseCase {
 
       const deleteUser = await this.repository.delete(_id);
 
-      this.logger.log('user successfully');
+      this.logger.log('user deleted successfully');
 
       return deleteUser;
     } catch (err) {

@@ -15,7 +15,7 @@ export class SaveUserUseCase {
       this.logger.log('creating user...');
 
       const validateUserEmail = await this.repository.findOne({
-        email: data.email.toLowerCase(),
+        email: data.email,
       });
 
       if (validateUserEmail) {

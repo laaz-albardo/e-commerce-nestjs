@@ -22,7 +22,7 @@ export class UpdateUserUseCase {
       await this.getUserUseCase.getUserById(_id);
 
       const validateEmail = await this.repository.findOne({
-        email: data.email.toLowerCase(),
+        email: data.email,
       });
 
       if (validateEmail && validateEmail.id !== _id) {

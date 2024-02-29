@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: IJWTPayload) {
     try {
-      this.logger.log('auth user...');
+      this.logger.log('auth user token...');
 
       const user = await this.getUserUseCase.getUserById(payload._id as string);
 
@@ -27,7 +27,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         throw new UnauthorizedException();
       }
 
-      this.logger.log('auth successfully');
+      this.logger.log('auth user token successfully');
+
       return user;
     } catch (err) {
       throw new CustomErrorException(err);

@@ -24,6 +24,13 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Auth(UserRoleEnum.SUPER_ADMIN)
+  @Post('admin')
+  @HttpCode(HttpStatus.CREATED)
+  createAdmin(@Body() createUserDto: CreateUserDto) {
+    return this.userService.createAdmin(createUserDto);
+  }
+
   @Auth(UserRoleEnum.ADMIN)
   @Get()
   @HttpCode(HttpStatus.OK)

@@ -6,7 +6,7 @@ import { CustomErrorException } from '@src/shared';
 import { UserRoleEnum } from '../enums';
 
 @Injectable()
-export class SaveUserUseCase {
+export class SaveUserAdminUseCase {
   private readonly logger = new Logger(UserRepository.name);
 
   constructor(private readonly repository: UserRepository) {}
@@ -25,7 +25,7 @@ export class SaveUserUseCase {
 
       let user = await this.repository.create({
         ...data,
-        role: UserRoleEnum.CLIENT,
+        role: UserRoleEnum.ADMIN,
       });
 
       user = await this.repository.save(user);

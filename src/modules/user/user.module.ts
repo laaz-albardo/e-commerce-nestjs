@@ -8,6 +8,7 @@ import {
   DeleteUserUseCase,
   GetUserUseCase,
   ListUsersUseCase,
+  SaveUserAdminUseCase,
   SaveUserUseCase,
   UpdateUserUseCase,
 } from './useCases';
@@ -25,6 +26,7 @@ import {
     UserService,
     UpdateUserUseCase,
     DeleteUserUseCase,
+    SaveUserAdminUseCase,
   ],
   exports: [UserRepository, GetUserUseCase],
 })

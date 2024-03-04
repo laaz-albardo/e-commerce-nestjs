@@ -20,9 +20,10 @@ export class User implements Partial<IUser> {
 
   @Prop({
     type: String,
-    enum: UserRoleEnum,
+    enum: [UserRoleEnum.ADMIN, UserRoleEnum.CLIENT],
     default: UserRoleEnum.CLIENT,
     required: true,
+    length: 11,
   })
   role: UserRoleEnum;
 

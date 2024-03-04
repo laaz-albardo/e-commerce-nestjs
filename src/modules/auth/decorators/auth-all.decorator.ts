@@ -9,7 +9,11 @@ import { UserRoleEnum } from '@src/modules/user/enums';
  * @constructor
  */
 export function AuthAll() {
-  const roles = [UserRoleEnum.ADMIN, UserRoleEnum.CLIENT];
+  const roles = [
+    UserRoleEnum.SUPER_ADMIN,
+    UserRoleEnum.ADMIN,
+    UserRoleEnum.CLIENT,
+  ];
   return applyDecorators(
     SetMetadata(ROLES_KEY, roles),
     UseGuards(JwtAuthGuard, RolesGuard),

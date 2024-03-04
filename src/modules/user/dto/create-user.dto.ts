@@ -1,7 +1,6 @@
 import { IUser } from '../interfaces';
 import {
   IsEmail,
-  IsEnum,
   IsString,
   Matches,
   MaxLength,
@@ -10,7 +9,6 @@ import {
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { CreatePersonDto } from './create-person.dto';
-import { UserRoleEnum } from '../enums';
 
 export class CreateUserDto implements Partial<IUser> {
   @IsEmail()
@@ -31,10 +29,6 @@ export class CreateUserDto implements Partial<IUser> {
     message: 'password must have at least one number',
   })
   password: string;
-
-  @IsEnum(UserRoleEnum)
-  @Transform(({ value }) => value.toUpperCase())
-  role: UserRoleEnum;
 
   @ValidateNested()
   @Type(() => CreatePersonDto)

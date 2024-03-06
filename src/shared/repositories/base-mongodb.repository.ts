@@ -40,4 +40,8 @@ export abstract class BaseMongoDbRepository<T>
   async delete(_id: string): Promise<T> {
     return await this.repository.findOneAndDelete({ _id }).exec();
   }
+
+  async deleteMany(options?: FilterQuery<T>): Promise<object> {
+    return await this.repository.deleteMany(options).exec();
+  }
 }

@@ -12,6 +12,7 @@ export class User implements Partial<IUser> {
     required: true,
     unique: true,
     lowercase: true,
+    index: true,
   })
   email: string;
 
@@ -20,7 +21,7 @@ export class User implements Partial<IUser> {
 
   @Prop({
     type: String,
-    enum: [UserRoleEnum.ADMIN, UserRoleEnum.CLIENT],
+    enum: UserRoleEnum,
     default: UserRoleEnum.CLIENT,
     required: true,
     length: 11,
@@ -37,6 +38,16 @@ UserSchema.pre('save', async function (next) {
   if (this.isNew) {
     const salt = await genSalt();
     this.password = await hash(this.password, salt);
+  }
+
+  next();
+});
+
+UserSchema.pre('insertMany', async function (next, docs: IUser[]) {
+  const salt = await genSalt();
+
+  for await (const save of docs) {
+    save.password = await hash(save.password, salt);
   }
 
   next();

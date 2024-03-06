@@ -16,6 +16,10 @@ export class UserRepository extends BaseMongoDbRepository<UserDocument> {
     return new this.repository(data);
   }
 
+  async saveMany(data: IUser[]): Promise<UserDocument[]> {
+    return await this.repository.insertMany(data);
+  }
+
   async findAll(): Promise<User[]> {
     return await this.repository.find().exec();
   }

@@ -12,6 +12,7 @@ import {
   SaveUserUseCase,
   UpdateUserUseCase,
 } from './useCases';
+import { UserSeeder } from './seeds';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import {
     UpdateUserUseCase,
     DeleteUserUseCase,
     SaveUserAdminUseCase,
+    UserSeeder,
   ],
   exports: [UserRepository, GetUserUseCase],
 })

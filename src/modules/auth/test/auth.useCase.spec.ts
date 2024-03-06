@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { MongooseConfigTest } from '@src/config';
-import * as supertest from 'supertest';
+import supertest from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { Connection } from 'mongoose';
 import { isInt } from 'class-validator';
-import { IUser, UserModule } from '@src/modules/user';
+import { IUser, UserModule, UserRoleEnum } from '@src/modules/user';
 import { AuthModule } from '../auth.module';
 
 describe('Start Auth Test', () => {
@@ -44,6 +44,7 @@ describe('Start Auth Test', () => {
       const userPayload: IUser = {
         email: 'test@test.com',
         password: '1234567890',
+        role: UserRoleEnum.ADMIN,
         person: {
           fullName: 'test test',
           codePostal: '6101',

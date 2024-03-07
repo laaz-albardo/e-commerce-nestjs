@@ -31,14 +31,14 @@ export class UserController {
     return this.userService.createAdmin(createUserDto);
   }
 
-  @Auth(UserRoleEnum.ADMIN)
+  @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Get()
   @HttpCode(HttpStatus.OK)
   findAll() {
     return this.userService.findAll();
   }
 
-  @Auth(UserRoleEnum.ADMIN)
+  @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
@@ -52,7 +52,7 @@ export class UserController {
     return this.userService.update(id, updateUserDto);
   }
 
-  @Auth(UserRoleEnum.ADMIN)
+  @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.ACCEPTED)
   remove(@Param('id') id: string) {

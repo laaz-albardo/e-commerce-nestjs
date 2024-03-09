@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from '../repositories';
 import { GetUserUseCase } from './get-user.useCase';
-import { CustomErrorException } from '@src/shared';
+import { errorInstaceOf } from '@src/shared';
 
 @Injectable()
 export class DeleteUserUseCase {
@@ -24,7 +24,7 @@ export class DeleteUserUseCase {
 
       return deleteUser;
     } catch (err) {
-      throw new CustomErrorException(err);
+      throw errorInstaceOf(err);
     }
   }
 }

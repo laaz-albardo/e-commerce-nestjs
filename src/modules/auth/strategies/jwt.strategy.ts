@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { GetUserUseCase } from '@src/modules/user';
 import { IJWTPayload } from '../interfaces';
-import { CustomErrorException } from '@src/shared';
+import { errorInstaceOf } from '@src/shared';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
       return user;
     } catch (err) {
-      throw new CustomErrorException(err);
+      throw errorInstaceOf(err);
     }
   }
 }

@@ -2,7 +2,7 @@ import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from '../repositories';
 import { CreateUserDto } from '../dto';
 import { User } from '../schemas';
-import { CustomErrorException } from '@src/shared';
+import { errorInstaceOf } from '@src/shared';
 import { UserRoleEnum } from '../enums';
 
 @Injectable()
@@ -34,7 +34,7 @@ export class SaveUserAdminUseCase {
 
       return user;
     } catch (err) {
-      throw new CustomErrorException(err);
+      throw errorInstaceOf(err);
     }
   }
 }

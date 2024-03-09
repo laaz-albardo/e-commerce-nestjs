@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from '../repositories';
 import { User } from '../schemas';
-import { CustomErrorException } from '@src/shared';
+import { errorInstaceOf } from '@src/shared';
 
 @Injectable()
 export class ListUsersUseCase {
@@ -19,7 +19,7 @@ export class ListUsersUseCase {
 
       return users;
     } catch (err) {
-      throw new CustomErrorException(err);
+      throw errorInstaceOf(err);
     }
   }
 }

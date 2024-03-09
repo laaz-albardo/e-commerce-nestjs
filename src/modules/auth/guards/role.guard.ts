@@ -7,7 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../keys';
 import { UserRoleEnum } from '@src/modules/user/enums/user-role.enum';
-import { CustomErrorException } from '@src/shared';
+import { errorInstaceOf } from '@src/shared';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -29,7 +29,7 @@ export class RolesGuard implements CanActivate {
       return true;
     } else {
       const err = new ForbiddenException('Permission denied');
-      throw new CustomErrorException(err);
+      throw errorInstaceOf(err);
     }
   }
 }

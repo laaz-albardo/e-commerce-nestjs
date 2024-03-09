@@ -4,7 +4,7 @@ import { GetUserUseCase } from './get-user.useCase';
 import { UpdateUserDto } from '../dto';
 import { UserDocument } from '../types';
 import { User } from '../schemas';
-import { CustomErrorException } from '@src/shared';
+import { errorInstaceOf } from '@src/shared';
 
 @Injectable()
 export class UpdateUserUseCase {
@@ -19,13 +19,13 @@ export class UpdateUserUseCase {
     try {
       this.logger.log('update user...');
 
-      await this.getUserUseCase.getUserById(_id);
+      const validateUser = await this.getUserUseCase.getUserById(_id);
 
       const validateEmail = await this.repository.findOne({
         email: data.email,
       });
 
-      if (validateEmail && validateEmail.id !== _id) {
+      if (validateEmail && validateEmail.id !== validateUser.id) {
         throw new ConflictException(
           'this email is already registered with another user',
         );
@@ -40,7 +40,7 @@ export class UpdateUserUseCase {
 
       return updateUser;
     } catch (err) {
-      throw new CustomErrorException(err);
+      throw errorInstaceOf(err);
     }
   }
 }

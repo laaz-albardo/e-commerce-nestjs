@@ -4,7 +4,7 @@ import {
   ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
-import { CustomErrorException } from '@src/shared';
+import { errorInstaceOf } from '@src/shared';
 
 export const ClassValidatorConfig = new ValidationPipe({
   whitelist: true,
@@ -40,5 +40,5 @@ export function ClassValidatorExceptions(errors: ValidationError[]) {
   });
   const err = new UnprocessableEntityException(e);
   const errMessage: any = err.getResponse();
-  return new CustomErrorException(err, errMessage.message);
+  return errorInstaceOf(err, errMessage.message);
 }

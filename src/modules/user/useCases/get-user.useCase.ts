@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from '../repositories';
-import { User } from '../schemas';
 import { Types } from 'mongoose';
-import { CustomErrorException } from '@src/shared';
+import { errorInstaceOf } from '@src/shared';
+import { UserDocument } from '../types';
 
 @Injectable()
 export class GetUserUseCase {
@@ -10,7 +10,7 @@ export class GetUserUseCase {
 
   constructor(private readonly repository: UserRepository) {}
 
-  async getUserById(_id: string): Promise<User> {
+  async getUserById(_id: string): Promise<UserDocument> {
     try {
       this.logger.log('get user...');
 
@@ -26,7 +26,7 @@ export class GetUserUseCase {
 
       return user;
     } catch (err) {
-      throw new CustomErrorException(err);
+      throw errorInstaceOf(err);
     }
   }
 }

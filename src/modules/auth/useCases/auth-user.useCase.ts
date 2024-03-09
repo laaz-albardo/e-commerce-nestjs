@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { compare } from 'bcrypt';
 import { User, UserRepository } from '@src/modules/user';
-import { CustomErrorException } from '@src/shared';
+import { errorInstaceOf } from '@src/shared';
 
 @Injectable()
 export class AuthUserUseCase {
@@ -36,7 +36,7 @@ export class AuthUserUseCase {
         throw new UnauthorizedException('Incorrect password');
       }
     } catch (err) {
-      throw new CustomErrorException(err);
+      throw errorInstaceOf(err);
     }
   }
 }

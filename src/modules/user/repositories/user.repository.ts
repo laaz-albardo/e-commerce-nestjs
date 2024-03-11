@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { UserDocument } from '../types';
 import { Model } from 'mongoose';
 import { IUser } from '../interfaces';
+import { UserRoleEnum } from '../enums';
 
 @Injectable()
 export class UserRepository extends BaseMongoDbRepository<UserDocument> {
@@ -21,6 +22,8 @@ export class UserRepository extends BaseMongoDbRepository<UserDocument> {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.repository.find().exec();
+    return await this.repository
+      .find({ role: { $ne: UserRoleEnum.SUPER_ADMIN } })
+      .exec();
   }
 }

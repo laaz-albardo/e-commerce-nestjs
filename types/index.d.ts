@@ -17,5 +17,12 @@ declare namespace NodeJS {
     MONGODB_PASSWORD: string;
     JWT_SECRET: string;
     JWT_EXPIRES: number;
+    SMTP_HOST: string;
+    SMTP_PORT: number;
+    SMTP_USERNAME: string;
+    SMTP_PASSWORD: string;
+    SMTP_SECURE_SSL: boolean;
+    SMTP_SENDER_NAME: string;
+    SMTP_SENDER_EMAIL_DEFAULT: string;
   }
 }

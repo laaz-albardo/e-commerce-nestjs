@@ -1,20 +1,31 @@
 import { DynamicModule } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import 'dotenv/config';
 
-const dbHost = `mongodb://${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}`;
+const dbHost = (configService: ConfigService) => {
+  return `mongodb://${configService.getOrThrow('MONGODB_HOST')}:${configService.getOrThrow('MONGODB_PORT')}`;
+};
 
-export const MongooseConfig: DynamicModule = MongooseModule.forRoot(dbHost, {
-  dbName: process.env.MONGODB_DBNAME,
-  user: process.env.MONGODB_USER,
-  pass: process.env.MONGODB_PASSWORD,
+export const MongooseConfig: DynamicModule = MongooseModule.forRootAsync({
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => {
+    return {
+      uri: dbHost(configService),
+      dbName: configService.getOrThrow('MONGODB_DBNAME'),
+      user: configService.getOrThrow('MONGODB_USER'),
+      pass: configService.getOrThrow('MONGODB_PASSWORD'),
+    };
+  },
 });
 
-export const MongooseConfigTest: DynamicModule = MongooseModule.forRoot(
-  dbHost,
-  {
-    dbName: process.env.MONGODB_DBTEST,
-    user: process.env.MONGODB_USER,
-    pass: process.env.MONGODB_PASSWORD,
+export const MongooseConfigTest: DynamicModule = MongooseModule.forRootAsync({
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => {
+    return {
+      uri: dbHost(configService),
+      dbName: configService.getOrThrow('MONGODB_DBTEST'),
+      user: configService.getOrThrow('MONGODB_USER'),
+      pass: configService.getOrThrow('MONGODB_PASSWORD'),
+    };
   },
-);
+});

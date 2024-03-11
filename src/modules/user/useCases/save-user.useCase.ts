@@ -4,12 +4,17 @@ import { CreateUserDto } from '../dto';
 import { User } from '../schemas';
 import { errorInstaceOf } from '@src/shared';
 import { UserRoleEnum } from '../enums';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MailEventEnum } from '@src/modules/mail';
 
 @Injectable()
 export class SaveUserUseCase {
   private readonly logger = new Logger(UserRepository.name);
 
-  constructor(private readonly repository: UserRepository) {}
+  constructor(
+    private readonly repository: UserRepository,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async saveUser(data: CreateUserDto): Promise<User> {
     try {
@@ -29,6 +34,8 @@ export class SaveUserUseCase {
       });
 
       user = await this.repository.save(user);
+
+      this.eventEmitter.emit(MailEventEnum.ACTIVATE_ACCOUNT, user);
 
       this.logger.log('user created successfully');
 

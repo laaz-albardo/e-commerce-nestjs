@@ -8,11 +8,13 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserService } from './user.service';
 import { Auth, AuthAll } from '@src/modules/auth';
 import { UserRoleEnum } from './enums';
+import { FastifyRequest } from 'fastify';
 
 @Controller('user')
 export class UserController {
@@ -46,13 +48,13 @@ export class UserController {
   }
 
   @AuthAll()
-  @Put(':id')
+  @Put()
   @HttpCode(HttpStatus.ACCEPTED)
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  update(@Req() req: FastifyRequest, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(req['user']._id, updateUserDto);
   }
 
-  @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
+  @Auth(UserRoleEnum.SUPER_ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.ACCEPTED)
   remove(@Param('id') id: string) {

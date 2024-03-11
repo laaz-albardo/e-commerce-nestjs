@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseConfig } from './config';
 import { AuthModule, SeederModule, UserModule } from './modules';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     UserModule,
     AuthModule,
     SeederModule,
+    MailModule,
   ],
 })
 export class AppModule {}

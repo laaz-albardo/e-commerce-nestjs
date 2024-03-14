@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../keys';
 import { UserRoleEnum } from '@src/modules/user/enums/user-role.enum';
 import { errorInstaceOf } from '@src/shared';
+import { FastifyRequest } from 'fastify';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -18,14 +19,16 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
+
     if (!requiredRoles) {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
-    const hasRole = () => requiredRoles.some((role) => user.role == role);
+    const requestRole = context.switchToHttp().getRequest<FastifyRequest>();
+    const hasRole = () =>
+      requiredRoles.some((role) => requestRole['user']?.role == role);
 
-    if (user && user.role && hasRole()) {
+    if (requestRole['user'] && requestRole['user']?.role && hasRole()) {
       return true;
     } else {
       const err = new ForbiddenException('Permission denied');

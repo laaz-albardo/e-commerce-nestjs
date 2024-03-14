@@ -8,16 +8,18 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IAuhtInterceptorResponse } from '../interfaces';
 import { AuthTransformer } from '../transformers';
+import { FastifyReply } from 'fastify';
 
 @Injectable()
 export class LoginInterceptor<T>
-  implements NestInterceptor<T, Promise<IAuhtInterceptorResponse<any>>>
+  implements
+    NestInterceptor<T, Promise<IAuhtInterceptorResponse<FastifyReply>>>
 {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Observable<Promise<IAuhtInterceptorResponse<any>>> {
-    const res = context.switchToHttp().getResponse();
+  ): Observable<Promise<IAuhtInterceptorResponse<FastifyReply>>> {
+    const res = context.switchToHttp().getResponse<FastifyReply>();
     return next.handle().pipe(
       map(async (data) => ({
         statusCode: res.statusCode,

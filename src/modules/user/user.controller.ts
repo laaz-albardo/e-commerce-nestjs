@@ -3,14 +3,14 @@ import {
   Get,
   Post,
   Body,
-  Put,
+  Patch,
   Param,
   Delete,
   HttpCode,
   HttpStatus,
   Req,
 } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto, UpdateUserPasswordDto } from './dto';
 import { UserService } from './user.service';
 import { Auth, AuthAll } from '@src/modules/auth';
 import { UserRoleEnum } from './enums';
@@ -48,10 +48,23 @@ export class UserController {
   }
 
   @AuthAll()
-  @Put()
+  @Patch()
   @HttpCode(HttpStatus.ACCEPTED)
   update(@Req() req: FastifyRequest, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(req['user']._id, updateUserDto);
+  }
+
+  @Auth(UserRoleEnum.CLIENT)
+  @Patch('update-password')
+  @HttpCode(HttpStatus.ACCEPTED)
+  updatePassword(
+    @Req() req: FastifyRequest,
+    @Body() updateUserPasswordDto: UpdateUserPasswordDto,
+  ) {
+    return this.userService.updatePassword(
+      req['user']._id,
+      updateUserPasswordDto,
+    );
   }
 
   @Auth(UserRoleEnum.SUPER_ADMIN)

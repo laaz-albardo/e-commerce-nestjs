@@ -10,6 +10,7 @@ import {
   ListUsersUseCase,
   SaveUserAdminUseCase,
   SaveUserUseCase,
+  UpdateUserPasswordUseCase,
   UpdateUserUseCase,
 } from './useCases';
 import { UserSeeder } from './seeds';
@@ -28,6 +29,7 @@ import { UserSeeder } from './seeds';
     UpdateUserUseCase,
     DeleteUserUseCase,
     SaveUserAdminUseCase,
+    UpdateUserPasswordUseCase,
     UserSeeder,
   ],
   exports: [UserRepository, GetUserUseCase],

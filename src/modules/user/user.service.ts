@@ -1,11 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto, UpdateUserPasswordDto } from './dto';
 import {
   DeleteUserUseCase,
   GetUserUseCase,
   ListUsersUseCase,
   SaveUserAdminUseCase,
   SaveUserUseCase,
+  UpdateUserPasswordUseCase,
   UpdateUserUseCase,
 } from './useCases';
 import { UserTransformer } from './transformers';
@@ -22,6 +23,7 @@ export class UserService {
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
     private readonly saveUserAdminUseCase: SaveUserAdminUseCase,
+    private readonly updateUserPasswordUseCase: UpdateUserPasswordUseCase,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -50,6 +52,18 @@ export class UserService {
 
   async update(_id: string, updateUserDto: UpdateUserDto) {
     const data = await this.updateUserUseCase.updateUser(_id, updateUserDto);
+
+    return this.response.send(data, HttpStatus.ACCEPTED, new UserTransformer());
+  }
+
+  async updatePassword(
+    _id: string,
+    updateUserPasswordDto: UpdateUserPasswordDto,
+  ) {
+    const data = await this.updateUserPasswordUseCase.updateUserPassword(
+      _id,
+      updateUserPasswordDto,
+    );
 
     return this.response.send(data, HttpStatus.ACCEPTED, new UserTransformer());
   }

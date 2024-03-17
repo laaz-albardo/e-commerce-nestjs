@@ -67,6 +67,13 @@ export class UserController {
     );
   }
 
+  @Auth(UserRoleEnum.CLIENT)
+  @Delete('delete-me')
+  @HttpCode(HttpStatus.ACCEPTED)
+  removeClient(@Req() req: FastifyRequest) {
+    return this.userService.remove(req['user']._id);
+  }
+
   @Auth(UserRoleEnum.SUPER_ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.ACCEPTED)

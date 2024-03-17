@@ -27,7 +27,7 @@ export class UpdateUserUseCase {
 
       if (validateEmail && validateEmail.id !== validateUser.id) {
         throw new ConflictException(
-          'this email is already registered with another user',
+          'This email is already registered with another user',
         );
       }
 

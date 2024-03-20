@@ -1,273 +1,527 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getConnectionToken } from '@nestjs/mongoose';
-import { User } from '../schemas';
 import { MongooseConfigTest } from '@src/config';
-import supertest from 'supertest';
-import { IUser } from '../interfaces';
-import { INestApplication } from '@nestjs/common';
-import { Connection } from 'mongoose';
 import { UserModule } from '../user.module';
-import { isInt } from 'class-validator';
-import { Types } from 'mongoose';
+import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import {
+  DeleteUserUseCase,
+  GetUserUseCase,
+  ListUsersUseCase,
+  SaveUserAdminUseCase,
+  SaveUserUseCase,
+  UpdateUserPasswordUseCase,
+  UpdateUserUseCase,
+} from '../useCases';
+import { UserRepository } from '../repositories';
+import mongoose from 'mongoose';
 import { UserRoleEnum } from '../enums';
-import { AuthModule } from '@src/modules/auth';
+import { UserService } from '../user.service';
+import { BaseResponse, CustomErrorException } from '@src/shared';
+import {
+  ConflictException,
+  HttpStatus,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { UserTransformer } from '../transformers';
+import { getConnectionToken } from '@nestjs/mongoose';
 
 describe('Start User Test', () => {
-  let app: INestApplication;
-  let connection: Connection;
-  let apiClient: supertest.Agent = null;
-  const testPort = isInt(Number(process.env.SERVER_TEST_PORT))
-    ? process.env.SERVER_TEST_PORT
-    : 8080;
+  let userService: UserService,
+    repository: UserRepository,
+    updateUserPasswordUseCase: UpdateUserPasswordUseCase,
+    connection: mongoose.Connection;
 
-  const path = '/user';
-  const authPath = '/auth';
-  let userId = null;
-  let token = null;
+  const response: any = new BaseResponse();
 
-  beforeAll(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [MongooseConfigTest, UserModule, AuthModule],
+  const userMock: any = {
+    _id: new mongoose.Types.ObjectId(),
+    email: 'testing@test.com',
+    password: '1234567890',
+    role: UserRoleEnum.SUPER_ADMIN,
+    person: {
+      fullName: 'testing mock',
+      codePostal: '6101',
+      country: 'venezuela',
+    },
+  };
+
+  beforeEach(async () => {
+    const app: TestingModule = await Test.createTestingModule({
+      imports: [
+        UserModule,
+        MongooseConfigTest,
+        ConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath: '.env',
+        }),
+        EventEmitterModule.forRoot({ global: true }),
+      ],
+      providers: [
+        UserService,
+        SaveUserUseCase,
+        ListUsersUseCase,
+        GetUserUseCase,
+        UpdateUserUseCase,
+        DeleteUserUseCase,
+        SaveUserAdminUseCase,
+        UpdateUserPasswordUseCase,
+        {
+          provide: UserRepository,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findOneById: jest.fn(),
+            save: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
-    connection = await module.get(getConnectionToken());
-    app = module.createNestApplication();
-    await app.listen(testPort);
-    await app.init();
+    connection = await app.get(getConnectionToken());
+    userService = app.get<UserService>(UserService);
+    updateUserPasswordUseCase = app.get<UpdateUserPasswordUseCase>(
+      UpdateUserPasswordUseCase,
+    );
+    repository = app.get<UserRepository>(UserRepository);
+  });
 
-    apiClient = supertest(await app.getUrl());
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   afterAll(async () => {
     await connection.dropDatabase();
     await connection.close();
-    await app.close();
   });
 
-  describe('User Use Case', () => {
-    test('Create User', async () => {
-      const payload: IUser = {
-        email: 'test@test.com',
-        password: '1234567890',
-        role: UserRoleEnum.ADMIN,
-        person: {
-          fullName: 'test test',
-          codePostal: '6101',
-          country: 'venezuela',
-        },
-      };
+  describe('initialize user services', () => {
+    it('should be defined', async () => {
+      expect(userService).toBeDefined();
+      expect(userService.findAll).toBeDefined();
 
-      const response = await apiClient
-        .post(path)
-        .set('Accept', 'application/json')
-        .send(<IUser>payload);
+      expect(userService.findOneById).toBeDefined();
 
-      expect(response.statusCode).toStrictEqual(201);
-      expect(response.body.data).toBeDefined();
+      expect(userService.createAdmin).toBeDefined();
 
-      userId = response.body.data._id;
+      expect(userService.create).toBeDefined();
 
-      const loginPayload = {
-        email: 'test@test.com',
-        password: '1234567890',
-      };
+      expect(userService.update).toBeDefined();
 
-      const authResponse = await apiClient
-        .post(`${authPath}/login`)
-        .set('Accept', 'application/json')
-        .send(loginPayload);
+      expect(userService.updatePassword).toBeDefined();
+      expect(updateUserPasswordUseCase.updateUserPassword).toBeDefined();
 
-      expect(authResponse.statusCode).toStrictEqual(201);
-      expect(authResponse.body).toBeDefined();
+      expect(userService.remove).toBeDefined();
 
-      token = authResponse.body.data.token;
-    });
-
-    test('List Users', async () => {
-      const response = await apiClient
-        .get(path)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
-
-      expect(response.statusCode).toStrictEqual(200);
-      expect(response.body.data).toBeInstanceOf(Array<User>);
-    });
-
-    test('Get User By Id', async () => {
-      const response = await apiClient
-        .get(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
-
-      expect(response.statusCode).toStrictEqual(200);
-      expect(response.body.data).toBeDefined();
-    });
-
-    test('Update User', async () => {
-      const payload: IUser = {
-        email: 'test2@test.com',
-        password: '12345678',
-        role: UserRoleEnum.ADMIN,
-        person: {
-          fullName: 'test test2',
-          codePostal: '6101',
-          country: 'venezuela',
-        },
-      };
-
-      const response = await apiClient
-        .put(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send(<IUser>payload);
-
-      expect(response.statusCode).toStrictEqual(202);
-      expect(response.body.data).toBeDefined();
-
-      userId = response.body.data._id;
-    });
-
-    test('Delete User By Id', async () => {
-      const response = await apiClient
-        .delete(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
-
-      expect(response.statusCode).toStrictEqual(202);
-      expect(response.body.data).toBeDefined();
+      expect(repository).toBeDefined();
+      expect(repository.create).toBeDefined();
+      expect(repository.save).toBeDefined();
+      expect(repository.findAll).toBeDefined();
+      expect(repository.findOneById).toBeDefined();
+      expect(repository.update).toBeDefined();
+      expect(repository.delete).toBeDefined();
     });
   });
 
-  describe('User Use Case Error', () => {
-    test('Save User -> Should throw an error if user email exist', async () => {
-      const payload: IUser = {
-        email: 'test@test.com',
-        password: '1234567890',
-        role: UserRoleEnum.ADMIN,
-        person: {
-          fullName: 'test test',
-          codePostal: '6101',
-          country: 'venezuela',
-        },
-      };
+  describe('success', () => {
+    describe('save use cases', () => {
+      it('should save a user admin', async () => {
+        const user = {
+          email: 'test@test.com',
+          password: '1234567890',
+          person: {
+            fullName: 'test test',
+            codePostal: '6101',
+            country: 'venezuela',
+          },
+        };
 
-      await apiClient
-        .post(path)
-        .set('Accept', 'application/json')
-        .send(<IUser>payload);
+        const userMockResponse = await response.send(
+          userMock,
+          HttpStatus.CREATED,
+          new UserTransformer(),
+        );
 
-      const response = await apiClient
-        .post(path)
-        .set('Accept', 'application/json')
-        .send(<IUser>payload);
+        const userResponse = await response.send(
+          user,
+          HttpStatus.CREATED,
+          new UserTransformer(),
+        );
 
-      expect(response.statusCode).toStrictEqual(409);
+        jest
+          .spyOn(repository, 'save')
+          .mockImplementationOnce(
+            async () => await Promise.resolve(userMockResponse.data),
+          );
+
+        const result = await userService.createAdmin(userResponse.data);
+
+        // Assert
+        expect(result.data).toEqual(userMockResponse.data);
+        expect(result.data['role']).toEqual(UserRoleEnum.SUPER_ADMIN);
+      });
+
+      it('should save a user', async () => {
+        const user = {
+          email: 'test@test.com',
+          password: '1234567890',
+          person: {
+            fullName: 'test test',
+            codePostal: '6101',
+            country: 'venezuela',
+          },
+        };
+
+        userMock.role = UserRoleEnum.CLIENT;
+
+        const userMockResponse = await response.send(
+          userMock,
+          HttpStatus.CREATED,
+          new UserTransformer(),
+        );
+
+        const userResponse = await response.send(
+          user,
+          HttpStatus.CREATED,
+          new UserTransformer(),
+        );
+
+        jest
+          .spyOn(repository, 'save')
+          .mockImplementationOnce(
+            async () => await Promise.resolve(userMockResponse.data),
+          );
+
+        const result = await userService.create(userResponse.data);
+
+        // Assert
+        expect(result.data).toEqual(userMockResponse.data);
+        expect(result.data['role']).toEqual(UserRoleEnum.CLIENT);
+      });
     });
 
-    test(`Get User By Id -> Should throw an error if user Id is invalid`, async () => {
-      userId = 248;
+    describe('find use cases', () => {
+      it('should get users', async () => {
+        jest
+          .spyOn(repository, 'findAll')
+          .mockImplementationOnce(async () => await Promise.resolve(userMock));
 
-      const response = await apiClient
-        .get(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
+        const result = await userService.findAll();
 
-      expect(response.statusCode).toStrictEqual(400);
+        // Assert
+        expect(result).toBeDefined();
+        expect(result.data['_id']).toEqual(userMock._id);
+      });
+
+      it('should get a user by id', async () => {
+        jest.spyOn(repository, 'findOneById').mockResolvedValue(userMock);
+
+        const result = await userService.findOneById(userMock._id);
+
+        // Assert
+        expect(repository.findOneById).toHaveBeenCalledWith(userMock._id);
+        expect(result).toBeDefined();
+        expect(result.data['_id']).toEqual(userMock._id);
+      });
     });
 
-    test(`Get User By Id -> Should throw an error if user Id don't exist`, async () => {
-      userId = new Types.ObjectId();
+    describe('update use cases', () => {
+      it('should update a user', async () => {
+        const updateUser = {
+          ...userMock,
+          email: 'test@testing.com',
+          person: { fullName: 'testing' },
+        };
 
-      const response = await apiClient
-        .get(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
+        const user = {
+          email: 'test@testing.com',
+          person: {
+            fullName: 'testing',
+            codePostal: '6101',
+            country: 'venezuela',
+          },
+        };
 
-      expect(response.statusCode).toStrictEqual(404);
+        jest.spyOn(repository, 'findOneById').mockResolvedValue(userMock);
+
+        jest.spyOn(repository, 'update').mockResolvedValue(updateUser);
+
+        const result = await userService.update(userMock._id, user);
+
+        // Assert
+        expect(repository.update).toHaveBeenCalledWith(userMock._id, user);
+        expect(result.data['email']).toEqual(user.email);
+        expect(result.data['person'].fullName).toEqual(user.person.fullName);
+      });
+
+      it('should update a user password', async () => {
+        const updateUser = {
+          ...userMock,
+          password: '0987654321',
+        };
+
+        const user = {
+          password: '0987654321',
+        };
+
+        jest.spyOn(repository, 'findOneById').mockResolvedValue(userMock);
+
+        jest.spyOn(repository, 'update').mockResolvedValue(updateUser);
+
+        const result = await updateUserPasswordUseCase.updateUserPassword(
+          userMock._id,
+          user,
+        );
+
+        // Assert
+        expect(repository.update).toHaveBeenCalledWith(userMock._id, user);
+        expect(result.password).toEqual(updateUser.password);
+      });
     });
 
-    test(`Update User By Id -> Should throw an error if user Id is invalid`, async () => {
-      userId = 248;
+    describe('delete use cases', () => {
+      it('should delete a user', async () => {
+        jest.spyOn(repository, 'findOneById').mockResolvedValue(userMock);
 
-      const response = await apiClient
-        .put(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
+        jest.spyOn(repository, 'delete').mockResolvedValue(userMock);
 
-      expect(response.statusCode).toStrictEqual(400);
+        const result = await userService.remove(userMock._id);
+
+        // Assert
+        expect(repository.delete).toHaveBeenCalledWith(userMock._id);
+        expect(result.data['_id']).toEqual(userMock._id);
+      });
+    });
+  });
+
+  describe('fails', () => {
+    describe('save user', () => {
+      it('should throw ConflictException if email is registered', async () => {
+        const user = {
+          email: 'test@test.com',
+          password: '1234567890',
+          person: {
+            fullName: 'test test',
+            codePostal: '6101',
+            country: 'venezuela',
+          },
+        };
+
+        const userResponse = await response.send(
+          user,
+          HttpStatus.CREATED,
+          new UserTransformer(),
+        );
+
+        const conflictException = new ConflictException(
+          `test@test.com registered`,
+        );
+
+        jest
+          .spyOn(repository, 'save')
+          .mockImplementation(
+            async () => await Promise.reject(conflictException),
+          );
+
+        // Assert
+        await expect(
+          userService.createAdmin(userResponse.data),
+        ).rejects.toThrow(CustomErrorException);
+      });
+
+      it(`should throw UnprocessableEntityException if password doesn't follow the required format`, async () => {
+        const user = {
+          email: 'test@test.com',
+          password: '1234567890',
+          person: {
+            fullName: 'test test',
+            codePostal: '6101',
+            country: 'venezuela',
+          },
+        };
+
+        const userResponse = await response.send(
+          user,
+          HttpStatus.CREATED,
+          new UserTransformer(),
+        );
+
+        const unprocessableEntityException = new UnprocessableEntityException(
+          `password must have at least one capital letter'`,
+        );
+
+        jest
+          .spyOn(repository, 'save')
+          .mockImplementation(
+            async () => await Promise.reject(unprocessableEntityException),
+          );
+
+        // Assert
+        await expect(
+          userService.createAdmin(userResponse.data),
+        ).rejects.toThrow(CustomErrorException);
+      });
     });
 
-    test(`Update User By Id -> Should throw an error if user Id don't exist`, async () => {
-      userId = new Types.ObjectId();
+    describe('get user by id', () => {
+      it('should throw BadRequestException if invalid ID is provide', async () => {
+        const id = 'invalid-id';
 
-      const response = await apiClient
-        .put(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
+        const isValidObjectIdMock = jest
+          .spyOn(mongoose, 'isValidObjectId')
+          .mockReturnValue(false);
 
-      expect(response.statusCode).toStrictEqual(404);
+        // Assert
+        await expect(userService.findOneById(id)).rejects.toThrow(
+          CustomErrorException,
+        );
+        isValidObjectIdMock.mockRestore();
+      });
+
+      it('should throw NotFoundException if user is not found', async () => {
+        const testId: any = new mongoose.Types.ObjectId();
+
+        const notFoundException = new NotFoundException(`User not found`);
+
+        jest
+          .spyOn(repository, 'findOneById')
+          .mockImplementation(
+            async () => await Promise.reject(notFoundException),
+          );
+
+        // Assert
+        await expect(userService.findOneById(testId)).rejects.toThrow(
+          CustomErrorException,
+        );
+      });
     });
 
-    test('Update User By Id-> Should throw an error if user email exist by other user', async () => {
-      const payload: IUser = {
-        email: 'test2@test.com',
-        password: '1234567890',
-        role: UserRoleEnum.CLIENT,
-        person: {
-          fullName: 'test test',
-          codePostal: '6101',
-          country: 'venezuela',
-        },
-      };
+    describe('update user', () => {
+      it('should throw BadRequestException if invalid ID is provide', async () => {
+        const id = 'invalid-id';
 
-      const userResponse = await apiClient
-        .post(path)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send(<IUser>payload);
+        const updateUser = {
+          ...userMock,
+          email: 'test@testing.com',
+          person: { fullName: 'testing' },
+        };
 
-      userId = userResponse.body.data._id;
+        const isValidObjectIdMock = jest
+          .spyOn(mongoose, 'isValidObjectId')
+          .mockReturnValue(false);
 
-      payload.email = 'test@test.com';
+        // Assert
+        await expect(userService.update(id, updateUser)).rejects.toThrow(
+          CustomErrorException,
+        );
+        isValidObjectIdMock.mockRestore();
+      });
 
-      const response = await apiClient
-        .put(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send(<IUser>payload);
+      it('should throw NotFoundException if user is not found', async () => {
+        const testId: any = new mongoose.Types.ObjectId();
 
-      expect(response.statusCode).toStrictEqual(409);
+        const updateUser = {
+          ...userMock,
+          email: 'test@testing.com',
+          person: { fullName: 'testing' },
+        };
+
+        const notFoundException = new NotFoundException(`User not found`);
+
+        jest
+          .spyOn(repository, 'findOneById')
+          .mockImplementation(
+            async () => await Promise.reject(notFoundException),
+          );
+
+        // Assert
+        await expect(userService.update(testId, updateUser)).rejects.toThrow(
+          CustomErrorException,
+        );
+      });
+
+      it('should throw ConflictException if email is registered by other user', async () => {
+        const updateUser = {
+          ...userMock,
+          email: 'test@testing.com',
+          person: { fullName: 'testing' },
+        };
+
+        const conflictException = new ConflictException(
+          `test@testing.com registered`,
+        );
+
+        jest.spyOn(repository, 'findOneById').mockResolvedValue(userMock);
+
+        jest
+          .spyOn(repository, 'update')
+          .mockImplementation(
+            async () => await Promise.reject(conflictException),
+          );
+
+        // Assert
+        await expect(
+          userService.update(userMock._id, updateUser),
+        ).rejects.toThrow(CustomErrorException);
+      });
+
+      it(`should throw UnprocessableEntityException if password doesn't follow the required format`, async () => {
+        const updateUserPassword = {
+          password: '0987654321',
+        };
+
+        const unprocessableEntityException = new UnprocessableEntityException(
+          `password must have at least one capital letter'`,
+        );
+
+        jest.spyOn(repository, 'findOneById').mockResolvedValue(userMock);
+
+        jest
+          .spyOn(repository, 'update')
+          .mockImplementation(
+            async () => await Promise.reject(unprocessableEntityException),
+          );
+
+        // Assert
+        await expect(
+          userService.updatePassword(userMock._id, updateUserPassword),
+        ).rejects.toThrow(CustomErrorException);
+      });
     });
 
-    test(`Delete User By Id -> Should throw an error if user Id is invalid`, async () => {
-      userId = 248;
+    describe('delete user', () => {
+      it('should throw BadRequestException if invalid ID is provide', async () => {
+        const id = 'invalid-id';
 
-      const response = await apiClient
-        .delete(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
+        const isValidObjectIdMock = jest
+          .spyOn(mongoose, 'isValidObjectId')
+          .mockReturnValue(false);
 
-      expect(response.statusCode).toStrictEqual(400);
-    });
+        // Assert
+        await expect(userService.remove(id)).rejects.toThrow(
+          CustomErrorException,
+        );
+        isValidObjectIdMock.mockRestore();
+      });
 
-    test(`Delete User By Id -> Should throw an error if user Id don't exist`, async () => {
-      userId = new Types.ObjectId();
+      it('should throw NotFoundException if user is not found', async () => {
+        const testId: any = new mongoose.Types.ObjectId();
 
-      const response = await apiClient
-        .delete(`${path}/${userId}`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
+        const notFoundException = new NotFoundException(`User not found`);
 
-      expect(response.statusCode).toStrictEqual(404);
+        jest
+          .spyOn(repository, 'findOneById')
+          .mockImplementation(
+            async () => await Promise.reject(notFoundException),
+          );
+
+        // Assert
+        await expect(userService.remove(testId)).rejects.toThrow(
+          CustomErrorException,
+        );
+      });
     });
   });
 });

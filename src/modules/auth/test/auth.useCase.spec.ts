@@ -1,141 +1,115 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { MongooseConfigTest } from '@src/config';
-import supertest from 'supertest';
-import { INestApplication } from '@nestjs/common';
-import { Connection } from 'mongoose';
-import { isInt } from 'class-validator';
-import { IUser, UserModule, UserRoleEnum } from '@src/modules/user';
+import mongoose from 'mongoose';
+import { UserModule, UserRepository, UserRoleEnum } from '@src/modules/user';
 import { AuthModule } from '../auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AuthUserUseCase, LoginUseCase } from '../useCases';
+import { JwtService } from '@nestjs/jwt';
+import { AuthService } from '../auth.service';
 
 describe('Start Auth Test', () => {
-  let app: INestApplication;
-  let connection: Connection;
-  let apiClient: supertest.Agent = null;
-  const testPort = isInt(Number(process.env.SERVER_TEST_PORT))
-    ? process.env.SERVER_TEST_PORT
-    : 8080;
+  let authService: AuthService,
+    repository: UserRepository,
+    connection: mongoose.Connection;
 
-  const userPath = '/user';
-  const authPath = '/auth';
-  let token: string;
+  const userMock: any = {
+    _id: new mongoose.Types.ObjectId(),
+    email: 'testing@test.com',
+    password: '1234567890La',
+    role: UserRoleEnum.SUPER_ADMIN,
+    person: {
+      fullName: 'testing mock',
+      codePostal: '6101',
+      country: 'venezuela',
+    },
+  };
 
-  beforeAll(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [MongooseConfigTest, UserModule, AuthModule],
+  beforeEach(async () => {
+    const app: TestingModule = await Test.createTestingModule({
+      imports: [
+        UserModule,
+        AuthModule,
+        MongooseConfigTest,
+        ConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath: '.env',
+        }),
+        EventEmitterModule.forRoot({ global: true }),
+      ],
+      providers: [
+        AuthService,
+        LoginUseCase,
+        AuthUserUseCase,
+        JwtService,
+        {
+          provide: UserRepository,
+          useValue: {
+            findOneById: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
-    connection = await module.get(getConnectionToken());
-    app = module.createNestApplication();
-    await app.listen(testPort);
-    await app.init();
+    connection = await app.get(getConnectionToken());
+    authService = app.get<AuthService>(AuthService);
+    repository = app.get<UserRepository>(UserRepository);
+  });
 
-    apiClient = supertest(await app.getUrl());
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   afterAll(async () => {
     await connection.dropDatabase();
     await connection.close();
-    await app.close();
   });
 
-  describe('Auth Use Case', () => {
-    test('Login', async () => {
-      const userPayload: IUser = {
-        email: 'test@test.com',
-        password: '1234567890',
-        role: UserRoleEnum.ADMIN,
-        person: {
-          fullName: 'test test',
-          codePostal: '6101',
-          country: 'venezuela',
-        },
-      };
+  describe('initialize auth services', () => {
+    it('should be defined', () => {
+      expect(authService).toBeDefined();
+      expect(authService.login).toBeDefined();
 
-      const userResponse = await apiClient
-        .post(userPath)
-        .set('Accept', 'application/json')
-        .send(<IUser>userPayload);
+      expect(authService).toBeDefined();
+      expect(authService.profile).toBeDefined();
 
-      expect(userResponse.statusCode).toStrictEqual(201);
-      expect(userResponse.body).toBeDefined();
-
-      const loginPayload = {
-        email: 'test@test.com',
-        password: '1234567890',
-      };
-
-      const authResponse = await apiClient
-        .post(`${authPath}/login`)
-        .set('Accept', 'application/json')
-        .send(loginPayload);
-
-      expect(authResponse.statusCode).toStrictEqual(201);
-      expect(authResponse.body).toBeDefined();
-
-      token = authResponse.body.data.token;
-    });
-
-    test('Auth Me', async () => {
-      const authResponse = await apiClient
-        .get(`${authPath}/me`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
-
-      expect(authResponse.statusCode).toStrictEqual(200);
-      expect(authResponse.body).toBeDefined();
-    });
-
-    test('Logout', async () => {
-      const authResponse = await apiClient
-        .post(`${authPath}/logout`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
-
-      expect(authResponse.statusCode).toStrictEqual(202);
-      expect(authResponse.body).toBeDefined();
+      expect(repository).toBeDefined();
+      expect(repository.findOneById).toBeDefined();
     });
   });
 
-  describe('Auth Use Case Error', () => {
-    test('Login -> Should throw an error if the credentials are incorrect.', async () => {
-      const loginPayload = {
-        email: 'test@test.com',
-        password: '123456789',
-      };
+  describe('success', () => {
+    describe('login use case', () => {
+      it('should login a user', async () => {
+        const userLogin = {
+          _doc: {
+            _id: userMock._id,
+            email: 'testing@test.com',
+            password: '1234567890La',
+          },
+        };
 
-      const authResponse = await apiClient
-        .post(`${authPath}/login`)
-        .set('Accept', 'application/json')
-        .send(loginPayload);
+        jest.spyOn(repository, 'findOneById').mockResolvedValue(userMock);
 
-      expect(authResponse.statusCode).toStrictEqual(401);
+        const result = await authService.login(userLogin);
 
-      token = null;
+        expect(result.hash).toBeDefined();
+        expect(result.user.email).toEqual(userLogin._doc.email);
+      });
     });
 
-    test('Auth Me -> Should throw an error if the token is invalid.', async () => {
-      const authResponse = await apiClient
-        .get(`${authPath}/me`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
+    describe('auth me use case', () => {
+      it('should authenticate a user', async () => {
+        jest.spyOn(repository, 'findOneById').mockResolvedValue(userMock);
 
-      expect(authResponse.statusCode).toStrictEqual(401);
-      expect(authResponse.body).toBeDefined();
-    });
+        const result = await authService.profile(userMock._id);
 
-    test('Logout -> Should throw an error if the token is invalid.', async () => {
-      const authResponse = await apiClient
-        .post(`${authPath}/logout`)
-        .set('Accept', 'application/json')
-        .set('Authorization', `Bearer ${token}`)
-        .send();
-
-      expect(authResponse.statusCode).toStrictEqual(401);
-      expect(authResponse.body).toBeDefined();
+        expect(repository.findOneById).toHaveBeenCalledWith(userMock._id);
+        expect(result).toBeDefined();
+        expect(result['_id']).toEqual(userMock._id);
+      });
     });
   });
 });

@@ -20,9 +20,9 @@ export class ActivateAccountListener {
         subject: 'Bienvenido a Ecomerce!',
         template: './user/activate-account',
         context: {
-          nombre: person.fullName,
+          name: person.fullName,
           email: email,
-          rol: role,
+          role: role,
           country: person.country,
           codePostal: person.codePostal,
         },

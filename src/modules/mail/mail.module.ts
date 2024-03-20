@@ -4,6 +4,7 @@ import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
 import { ActivateAccountListener } from './listeners';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
+import HandlebarsHelper from 'handlebars-helpers';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { join } from 'path';
             adapter: new HandlebarsAdapter(),
             options: {
               strict: true,
+              helpers: HandlebarsHelper(),
             },
           },
         };

@@ -54,7 +54,7 @@ export class UserController {
     return this.userService.update(req['user']._id, updateUserDto);
   }
 
-  @Auth(UserRoleEnum.CLIENT)
+  @Auth(UserRoleEnum.ADMIN, UserRoleEnum.CLIENT)
   @Patch('update-password')
   @HttpCode(HttpStatus.ACCEPTED)
   updatePassword(

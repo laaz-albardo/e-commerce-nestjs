@@ -1,9 +1,16 @@
 import { IPerson } from '../interfaces';
-import { IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class CreatePersonDto implements IPerson {
-  @Matches(/^[a-z ]+$/i, { message: 'fullName must be a string of letters' })
+  @IsNotEmpty()
   @MaxLength(100)
+  @Matches(/^[a-z ]+$/i, { message: 'fullName must be a string of letters' })
   fullName: string;
 
   @IsString()
@@ -11,11 +18,13 @@ export class CreatePersonDto implements IPerson {
   @IsOptional()
   phoneNumber?: string | null;
 
+  @IsNotEmpty()
   @IsString()
   @MaxLength(10)
   codePostal: string;
 
-  @Matches(/^[a-z ]+$/i, { message: 'country must be a string of letters' })
+  @IsNotEmpty()
   @MaxLength(20)
+  @Matches(/^[a-z ]+$/i, { message: 'country must be a string of letters' })
   country: string;
 }

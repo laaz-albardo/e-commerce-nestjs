@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import {
+  DeleteCategoryUseCase,
   GetCategoryUseCase,
   ListCategoriesUseCase,
   SaveCategoryUseCase,
@@ -19,6 +20,7 @@ export class CategoryService {
     private readonly listCategoriesUseCase: ListCategoriesUseCase,
     private readonly getCategoryUseCase: GetCategoryUseCase,
     private readonly updateCategoryUseCase: UpdateCategoryUseCase,
+    private readonly deleteCategoryUseCase: DeleteCategoryUseCase,
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
@@ -56,7 +58,13 @@ export class CategoryService {
     );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: string) {
+    const data = await this.deleteCategoryUseCase.deleteCategory(id);
+
+    return this.response.send(
+      data,
+      HttpStatus.ACCEPTED,
+      new CategoryTransformer(),
+    );
   }
 }

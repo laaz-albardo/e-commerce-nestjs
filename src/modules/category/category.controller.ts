@@ -45,8 +45,9 @@ export class CategoryController {
     return this.categoryService.update(id, updateCategoryDto);
   }
 
+  @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+    return this.categoryService.remove(id);
   }
 }

@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Category, CategorySchema } from './schemas';
 import { CategoryRepository } from './repositories';
 import {
+  DeleteCategoryUseCase,
   GetCategoryUseCase,
   ListCategoriesUseCase,
   SaveCategoryUseCase,
@@ -25,6 +26,7 @@ import {
     ListCategoriesUseCase,
     GetCategoryUseCase,
     UpdateCategoryUseCase,
+    DeleteCategoryUseCase,
   ],
 })
 export class CategoryModule {}

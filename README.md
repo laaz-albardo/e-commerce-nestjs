@@ -23,10 +23,26 @@ crear archivo .env en la ruta raiz del sistema y configurar las siguiente variab
 SERVER_PORT=8000
 
 # Sincronize true only with MongoDB
-MONGODB_HOST=url/port
+MONGODB_HOST=localhost         # Default localhost
+MONGODB_PORT=27017             # Default port 27017
 MONGODB_DBNAME=dbname
+MONGODB_DBTEST=dbtest
 MONGODB_USER=username
 MONGODB_PASSWORD=password
+
+# JWT Config
+JWT_SECRET=secret
+JWT_EXPIRES=                  # Set time in seconds
+
+# SMTP Config
+# Si no tiene todavia unas credenciales smtp, solo copie y pegue sin problemas
+SMTP_HOST=mail
+SMTP_PORT=1025
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_SECURE_SSL=false         # Solo true para produccion
+SMTP_SENDER_NAME=Notifications
+SMTP_SENDER_EMAIL_DEFAULT=notification@localhost.com
 ```
 
 ## Running the app
@@ -37,6 +53,16 @@ $ pnpm run start or npm run start
 
 # watch mode
 $ pnpm run dev or npm run dev
+```
+
+## Running Seeds
+
+```bash
+# run seed
+$ pnpm run seed or npm run seed
+
+# drop schema and run seed
+$ pnpm run seed:refresh or npm run seed:refresh
 ```
 
 ### WARNING

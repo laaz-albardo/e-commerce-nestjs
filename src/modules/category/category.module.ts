@@ -4,7 +4,11 @@ import { CategoryController } from './category.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Category, CategorySchema } from './schemas';
 import { CategoryRepository } from './repositories';
-import { ListCategoriesUseCase, SaveCategoryUseCase } from './useCases';
+import {
+  GetCategoryUseCase,
+  ListCategoriesUseCase,
+  SaveCategoryUseCase,
+} from './useCases';
 
 @Module({
   imports: [
@@ -18,6 +22,7 @@ import { ListCategoriesUseCase, SaveCategoryUseCase } from './useCases';
     CategoryRepository,
     SaveCategoryUseCase,
     ListCategoriesUseCase,
+    GetCategoryUseCase,
   ],
 })
 export class CategoryModule {}

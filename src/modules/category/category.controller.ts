@@ -12,8 +12,8 @@ import {
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Auth } from '../auth';
-import { UserRoleEnum } from '../user';
+import { Auth } from '@src/modules/auth';
+import { UserRoleEnum } from '@src/modules/user';
 
 @Controller('category')
 export class CategoryController {
@@ -36,12 +36,13 @@ export class CategoryController {
     return this.categoryService.findOne(id);
   }
 
+  @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.categoryService.update(+id, updateCategoryDto);
+    return this.categoryService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')

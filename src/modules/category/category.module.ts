@@ -8,6 +8,7 @@ import {
   GetCategoryUseCase,
   ListCategoriesUseCase,
   SaveCategoryUseCase,
+  UpdateCategoryUseCase,
 } from './useCases';
 
 @Module({
@@ -23,6 +24,7 @@ import {
     SaveCategoryUseCase,
     ListCategoriesUseCase,
     GetCategoryUseCase,
+    UpdateCategoryUseCase,
   ],
 })
 export class CategoryModule {}

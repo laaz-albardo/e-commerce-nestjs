@@ -5,6 +5,7 @@ import {
   GetCategoryUseCase,
   ListCategoriesUseCase,
   SaveCategoryUseCase,
+  UpdateCategoryUseCase,
 } from './useCases';
 import { BaseResponse } from '@src/shared';
 import { CategoryTransformer } from './transformers';
@@ -17,6 +18,7 @@ export class CategoryService {
     private readonly saveCategoryUseCase: SaveCategoryUseCase,
     private readonly listCategoriesUseCase: ListCategoriesUseCase,
     private readonly getCategoryUseCase: GetCategoryUseCase,
+    private readonly updateCategoryUseCase: UpdateCategoryUseCase,
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
@@ -41,8 +43,17 @@ export class CategoryService {
     return this.response.send(data, HttpStatus.OK, new CategoryTransformer());
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+    const data = await this.updateCategoryUseCase.updateCategory(
+      id,
+      updateCategoryDto,
+    );
+
+    return this.response.send(
+      data,
+      HttpStatus.ACCEPTED,
+      new CategoryTransformer(),
+    );
   }
 
   remove(id: number) {

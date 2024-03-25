@@ -15,4 +15,8 @@ export class CategoryRepository extends BaseMongoDbRepository<CategoryDocument> 
   async create(data: ICategory): Promise<CategoryDocument> {
     return new this.repository(data);
   }
+
+  async findAll(): Promise<CategoryDocument[]> {
+    return await this.repository.find().exec();
+  }
 }

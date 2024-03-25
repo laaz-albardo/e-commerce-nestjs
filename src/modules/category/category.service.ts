@@ -1,11 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { SaveCategoryUseCase } from './useCases';
+import { BaseResponse } from '@src/shared';
+import { CategoryTransformer } from './transformers';
 
 @Injectable()
 export class CategoryService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  private readonly response: BaseResponse = new BaseResponse();
+
+  constructor(private readonly saveCategoryUseCase: SaveCategoryUseCase) {}
+
+  async create(createCategoryDto: CreateCategoryDto) {
+    const data = await this.saveCategoryUseCase.saveCategory(createCategoryDto);
+
+    return this.response.send(
+      data,
+      HttpStatus.CREATED,
+      new CategoryTransformer(),
+    );
   }
 
   findAll() {

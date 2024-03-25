@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { SaveCategoryUseCase } from './useCases';
+import { ListCategoriesUseCase, SaveCategoryUseCase } from './useCases';
 import { BaseResponse } from '@src/shared';
 import { CategoryTransformer } from './transformers';
 
@@ -9,7 +9,10 @@ import { CategoryTransformer } from './transformers';
 export class CategoryService {
   private readonly response: BaseResponse = new BaseResponse();
 
-  constructor(private readonly saveCategoryUseCase: SaveCategoryUseCase) {}
+  constructor(
+    private readonly saveCategoryUseCase: SaveCategoryUseCase,
+    private readonly listCategoriesUseCase: ListCategoriesUseCase,
+  ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
     const data = await this.saveCategoryUseCase.saveCategory(createCategoryDto);
@@ -21,8 +24,10 @@ export class CategoryService {
     );
   }
 
-  findAll() {
-    return `This action returns all category`;
+  async findAll() {
+    const data = await this.listCategoriesUseCase.listUsers();
+
+    return this.response.send(data, HttpStatus.OK, new CategoryTransformer());
   }
 
   findOne(id: number) {

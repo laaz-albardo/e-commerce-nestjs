@@ -11,20 +11,16 @@ export class ActivateAccountListener {
   constructor(private readonly mailService: MailerService) {}
 
   @OnEvent(MailEventEnum.ACTIVATE_ACCOUNT, { async: true })
-  async handleActivateAccountEvent({ email, role, person }: User) {
+  async handleActivateAccountEvent({ email, person }: User) {
     try {
       this.logger.log('send email activate account');
 
       await this.mailService.sendMail({
         to: email,
-        subject: 'Bienvenido a Ecomerce!',
+        subject: 'Welcome to Ecommerce!',
         template: './user/activate-account',
         context: {
           name: person.fullName,
-          email: email,
-          role: role,
-          country: person.country,
-          codePostal: person.codePostal,
         },
       });
 

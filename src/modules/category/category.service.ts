@@ -39,7 +39,7 @@ export class CategoryService {
     return this.response.send(data, HttpStatus.OK, new CategoryTransformer());
   }
 
-  async findOne(id: string) {
+  async findOneById(id: string) {
     const data = await this.getCategoryUseCase.getCategoryById(id);
 
     return this.response.send(data, HttpStatus.OK, new CategoryTransformer());

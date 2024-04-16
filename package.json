@@ -22,6 +22,10 @@
     "seed:refresh": "nest build && node dist/seeder --refresh"
   },
   "dependencies": {
+    "@fastify/compress": "^7.0.3",
+    "@fastify/cookie": "^9.3.1",
+    "@fastify/multipart": "^8.2.0",
+    "@fastify/static": "^7.0.3",
     "@nestjs-modules/mailer": "1.10.3",
     "@nestjs/common": "^10.3.2",
     "@nestjs/config": "^3.2.0",
@@ -37,7 +41,9 @@
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.1.0",
     "dotenv": "^16.4.1",
-    "fastify": "^4.26.1",
+    "fastify": "4.26.0",
+    "fastify-file-interceptor": "^1.0.9",
+    "fastify-multer": "^2.0.3",
     "handlebars": "^4.7.8",
     "handlebars-helpers": "^0.10.0",
     "mongoose": "^8.1.1",
@@ -45,7 +51,8 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.1",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.2",
@@ -63,6 +70,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "class-transformer": "^0.5.1",

@@ -1,9 +1,17 @@
 import { DynamicModule } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { matches } from 'class-validator';
 
 const dbHost = (configService: ConfigService) => {
-  return `mongodb://${configService.getOrThrow('MONGODB_HOST')}:${configService.getOrThrow('MONGODB_PORT')}`;
+  const url = matches(
+    configService.getOrThrow('MONGODB_URL'),
+    /^(mongodb:\/\/|mongodb\+srv:\/\/)/,
+  )
+    ? configService.getOrThrow('MONGODB_URL')
+    : `mongodb://${configService.getOrThrow('MONGODB_HOST')}:${configService.getOrThrow('MONGODB_PORT')}`;
+
+  return url;
 };
 
 export const MongooseConfig: DynamicModule = MongooseModule.forRootAsync({

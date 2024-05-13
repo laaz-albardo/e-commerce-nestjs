@@ -26,9 +26,9 @@ async function bootstrap() {
   // Validations
   app.useGlobalPipes(ClassValidatorConfig);
 
-  await app.listen(process.env.SERVER_PORT);
+  await app.listen(process.env.SERVER_PORT, process.env.SERVER_HOST);
   Logger.log(
-    `Welcome to ${process.env.PRODUCT_NAME}, Server run on http://127.0.0.1:${process.env.SERVER_PORT}/api`,
+    `Welcome to ${process.env.PRODUCT_NAME}, Server run on http://${process.env.SERVER_HOST}:${process.env.SERVER_PORT}/api`,
   );
 }
 bootstrap();

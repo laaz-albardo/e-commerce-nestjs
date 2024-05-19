@@ -7,6 +7,7 @@ declare namespace NodeJS {
     ENCRYPTION_DEFAULT: string;
     TZ: string;
     NODE_ENV: string;
+    SERVER_HOST: string;
     SERVER_PORT: number;
     SERVER_TEST_PORT: number;
     MONGODB_HOST: string;

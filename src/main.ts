@@ -19,7 +19,8 @@ async function bootstrap() {
 
   // Cors
   app.enableCors({
-    origin: '*',
+    origin: ['http://localhost:3000'],
+    credentials: true,
   });
 
   // use validators containers

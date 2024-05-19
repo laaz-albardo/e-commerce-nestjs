@@ -6,6 +6,8 @@ import { File, FileSchema } from './schemas';
 import { FastifyMulterModule } from 'fastify-file-interceptor';
 import { CloudinaryProvider, MulterConfig } from '@config/fileUpload';
 import { Options } from 'multer';
+import { SaveFilesUseCase } from './useCases/save-files.useCase';
+import { FileRepository } from './repositories';
 
 @Module({
   imports: [
@@ -19,6 +21,11 @@ import { Options } from 'multer';
     }),
   ],
   controllers: [FileController],
-  providers: [FileService, CloudinaryProvider],
+  providers: [
+    FileService,
+    CloudinaryProvider,
+    FileRepository,
+    SaveFilesUseCase,
+  ],
 })
 export class FileModule {}

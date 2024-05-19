@@ -4,7 +4,7 @@ import {
   FilesFastifyInterceptor,
 } from 'fastify-file-interceptor';
 import { BadRequestException, Logger } from '@nestjs/common';
-import { extname, join } from 'path';
+import { extname } from 'path';
 import { v4 as uuidV4 } from 'uuid';
 import { errorInstaceOf } from '@src/shared';
 import 'dotenv/config';
@@ -18,7 +18,7 @@ const saveStorage = (): StorageEngine => {
   } else {
     logger.log('Using Local Config');
     return diskStorage({
-      destination: join(__dirname, '../../../', 'public/upload/images'),
+      destination: './public/upload/images',
       filename: function (req, file, cb) {
         const uniqueNameFile =
           uuidV4() + extname(file.originalname).toLocaleLowerCase();

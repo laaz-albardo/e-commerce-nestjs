@@ -12,13 +12,15 @@ async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
-    {
-      cors: true,
-    },
   );
 
   // Global prefix
   app.setGlobalPrefix('api');
+
+  // Cors
+  app.enableCors({
+    origin: '*',
+  });
 
   // use validators containers
   useContainer(app.select(AppModule), { fallbackOnErrors: true });

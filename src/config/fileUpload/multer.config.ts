@@ -1,31 +1,23 @@
-import { diskStorage, memoryStorage, Options, StorageEngine } from 'multer';
+import { diskStorage, Options, StorageEngine } from 'multer';
 import {
   FileFastifyInterceptor,
   FilesFastifyInterceptor,
 } from 'fastify-file-interceptor';
-import { BadRequestException, Logger } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { extname } from 'path';
 import { v4 as uuidV4 } from 'uuid';
 import { errorInstaceOf } from '@src/shared';
 import 'dotenv/config';
 
-const logger = new Logger('MulterConfig');
-
 const saveStorage = (): StorageEngine => {
-  if (String(process.env.CLOUDINARY) === 'true') {
-    logger.log('Using Cloudinary Config');
-    return memoryStorage();
-  } else {
-    logger.log('Using Local Config');
-    return diskStorage({
-      destination: './public/upload/images',
-      filename: function (req, file, cb) {
-        const uniqueNameFile =
-          uuidV4() + extname(file.originalname).toLocaleLowerCase();
-        cb(null, uniqueNameFile);
-      },
-    });
-  }
+  return diskStorage({
+    destination: './public/upload/images',
+    filename: function (req, file, cb) {
+      const uniqueNameFile =
+        uuidV4() + extname(file.originalname).toLocaleLowerCase();
+      cb(null, uniqueNameFile);
+    },
+  });
 };
 
 export const MulterConfig: Options = {

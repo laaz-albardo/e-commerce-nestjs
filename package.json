@@ -39,7 +39,6 @@
     "@nestjs/platform-fastify": "^10.3.3",
     "@nestjs/swagger": "^7.3.0",
     "bcrypt": "^5.1.1",
-    "cloudinary": "^2.1.0",
     "dotenv": "^16.4.1",
     "fastify": "4.26.0",
     "fastify-file-interceptor": "^1.0.9",

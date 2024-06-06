@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FileDocument } from '../types/file.type';
 import { Model } from 'mongoose';
 import { File } from '../schemas';
+import { IFile } from '../interfaces';
 
 @Injectable()
 export class FileRepository extends BaseMongoDbRepository<FileDocument> {
@@ -11,11 +12,7 @@ export class FileRepository extends BaseMongoDbRepository<FileDocument> {
     super(File.name, repository);
   }
 
-  async create(): Promise<FileDocument> {
-    return new this.repository();
-  }
-
-  async findAll(): Promise<FileDocument[]> {
-    return await this.repository.find().exec();
+  async create(data?: IFile): Promise<FileDocument> {
+    return new this.repository(data);
   }
 }

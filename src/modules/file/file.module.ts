@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { FileService } from './file.service';
-import { FileController } from './file.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { File, FileSchema } from './schemas';
 import { FastifyMulterModule } from 'fastify-file-interceptor';
-import { CloudinaryProvider, MulterConfig } from '@config/fileUpload';
 import { Options } from 'multer';
-import { SaveFilesUseCase } from './useCases/save-files.useCase';
+import { MulterConfig } from '@config/fileUpload';
 import { FileRepository } from './repositories';
+import { SaveArrayFilesUseCase, SaveFileUseCase } from './useCases';
 
 @Module({
   imports: [
@@ -20,12 +18,6 @@ import { FileRepository } from './repositories';
       },
     }),
   ],
-  controllers: [FileController],
-  providers: [
-    FileService,
-    CloudinaryProvider,
-    FileRepository,
-    SaveFilesUseCase,
-  ],
+  providers: [FileRepository, SaveArrayFilesUseCase, SaveFileUseCase],
 })
 export class FileModule {}

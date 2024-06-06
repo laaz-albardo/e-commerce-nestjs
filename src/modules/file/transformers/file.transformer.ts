@@ -8,7 +8,7 @@ export class FileTransformer extends Transformer {
   }
 
   public async transform(file: IFile): Promise<IFile> {
-    const fullPath = `${process.env.SERVER_HOST}:${process.env.SERVER_PORT}/${file.route}`;
+    const fullPath = `${process.env.SERVER_HOST}/${file.route}`;
 
     return {
       _id: file._id,

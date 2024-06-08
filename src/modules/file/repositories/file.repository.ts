@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BaseMongoDbRepository } from '@src/shared';
 import { InjectModel } from '@nestjs/mongoose';
-import { FileDocument } from '../types/file.type';
+import { FileDocument } from '../types';
 import { Model } from 'mongoose';
 import { File } from '../schemas';
 import { IFile } from '../interfaces';

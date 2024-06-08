@@ -50,6 +50,10 @@ export const MulterConfig: Options = {
   },
 };
 
-export const MulterMultiStorage = FilesFastifyInterceptor('files', 6);
+export const MulterMultiStorage = FilesFastifyInterceptor(
+  'files',
+  6,
+  MulterConfig,
+);
 
-export const MulterStorage = FileFastifyInterceptor('file');
+export const MulterStorage = FileFastifyInterceptor('file', MulterConfig);

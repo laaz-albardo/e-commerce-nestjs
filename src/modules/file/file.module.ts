@@ -19,5 +19,6 @@ import { SaveArrayFilesUseCase, SaveFileUseCase } from './useCases';
     }),
   ],
   providers: [FileRepository, SaveArrayFilesUseCase, SaveFileUseCase],
+  exports: [FileRepository, SaveArrayFilesUseCase, SaveFileUseCase],
 })
 export class FileModule {}

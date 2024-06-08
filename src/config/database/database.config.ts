@@ -22,7 +22,6 @@ export const MongooseConfig: DynamicModule = MongooseModule.forRootAsync({
       dbName: configService.getOrThrow('MONGODB_DBNAME'),
       user: configService.getOrThrow('MONGODB_USER'),
       pass: configService.getOrThrow('MONGODB_PASSWORD'),
-      autoCreate: false,
     };
   },
 });

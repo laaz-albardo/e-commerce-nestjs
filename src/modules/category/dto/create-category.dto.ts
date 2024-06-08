@@ -2,11 +2,11 @@ import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 import { ICategory } from '../interfaces';
 import { Transform } from 'class-transformer';
 
-export class CreateCategoryDto implements ICategory {
+export class CreateCategoryDto implements Omit<ICategory, 'file'> {
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
   @MaxLength(50)
-  @Transform(({ value }) => value.toLowerCase())
+  @Transform(({ value }) => String(value.toLowerCase()), { toClassOnly: true })
   name: string;
 }

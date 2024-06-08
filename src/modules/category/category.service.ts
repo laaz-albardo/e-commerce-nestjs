@@ -23,8 +23,14 @@ export class CategoryService {
     private readonly deleteCategoryUseCase: DeleteCategoryUseCase,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto) {
-    const data = await this.saveCategoryUseCase.saveCategory(createCategoryDto);
+  async create(
+    createCategoryDto: CreateCategoryDto,
+    image: Express.Multer.File,
+  ) {
+    const data = await this.saveCategoryUseCase.saveCategory(
+      createCategoryDto,
+      image,
+    );
 
     return this.response.send(
       data,

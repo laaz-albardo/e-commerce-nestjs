@@ -8,12 +8,15 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Auth } from '@src/modules/auth';
 import { UserRoleEnum } from '@src/modules/user';
+import { MulterStorage } from '@src/config';
 
 @Controller('category')
 export class CategoryController {
@@ -21,9 +24,13 @@ export class CategoryController {
 
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Post()
+  @UseInterceptors(MulterStorage)
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  create(
+    @Body() createCategoryDto: CreateCategoryDto,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    return this.categoryService.create(createCategoryDto, image);
   }
 
   @Get()

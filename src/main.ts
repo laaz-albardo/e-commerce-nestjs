@@ -7,6 +7,10 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { useContainer } from 'class-validator';
+import compression from '@fastify/compress';
+import fastifyCookie from '@fastify/cookie';
+import { contentParser } from 'fastify-file-interceptor';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -19,7 +23,7 @@ async function bootstrap() {
 
   // Cors
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://parrella.vercel.app'],
+    origin: '*',
     credentials: true,
   });
 
@@ -29,7 +33,16 @@ async function bootstrap() {
   // Validations
   app.useGlobalPipes(ClassValidatorConfig);
 
-  await app.listen(process.env.SERVER_PORT, process.env.SERVER_HOST);
+  await app.register(compression);
+  await app.register(fastifyCookie, { parseOptions: { httpOnly: true } });
+  await app.register(contentParser);
+
+  app.useStaticAssets({
+    root: join(__dirname, '..', 'public'),
+    prefix: '/public/',
+  });
+
+  await app.listen(process.env.SERVER_PORT, '0.0.0.0');
   Logger.log(
     `Welcome to ${process.env.PRODUCT_NAME}, Server run on http://${process.env.SERVER_HOST}:${process.env.SERVER_PORT}/api`,
   );

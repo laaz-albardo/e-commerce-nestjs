@@ -11,12 +11,14 @@ import {
   SaveCategoryUseCase,
   UpdateCategoryUseCase,
 } from './useCases';
+import { FileModule } from '../file';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Category.name, schema: CategorySchema },
     ]),
+    FileModule,
   ],
   controllers: [CategoryController],
   providers: [

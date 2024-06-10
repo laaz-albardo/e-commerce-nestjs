@@ -16,19 +16,40 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CategoryTransformer } from '../transformers';
+import { FileModule, SaveFileUseCase } from '@src/modules/file';
+import { MongooseConfigTest } from '@src/config';
+import { ConfigModule } from '@nestjs/config';
+import { v4 as uuidV4 } from 'uuid';
+import { getConnectionToken } from '@nestjs/mongoose';
 
 describe('Start Category Test', () => {
-  let categoryService: CategoryService, repository: CategoryRepository;
+  let categoryService: CategoryService,
+    repository: CategoryRepository,
+    connection: mongoose.Connection;
 
   const response: any = new BaseResponse();
+
+  const fileMock: any = {
+    _id: new mongoose.Types.ObjectId(),
+    route: uuidV4(),
+  };
 
   const categoryMock: any = {
     _id: new mongoose.Types.ObjectId(),
     name: 'mens',
+    file: fileMock,
   };
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
+      imports: [
+        FileModule,
+        MongooseConfigTest,
+        ConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath: '.env',
+        }),
+      ],
       providers: [
         CategoryService,
         SaveCategoryUseCase,
@@ -36,6 +57,7 @@ describe('Start Category Test', () => {
         GetCategoryUseCase,
         UpdateCategoryUseCase,
         DeleteCategoryUseCase,
+        SaveFileUseCase,
         {
           provide: CategoryRepository,
           useValue: {
@@ -51,12 +73,18 @@ describe('Start Category Test', () => {
       ],
     }).compile();
 
+    connection = await app.get(getConnectionToken());
     categoryService = app.get<CategoryService>(CategoryService);
     repository = app.get<CategoryRepository>(CategoryRepository);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  afterAll(async () => {
+    await connection.dropDatabase();
+    await connection.close();
   });
 
   describe('initialize category services', () => {
@@ -108,7 +136,10 @@ describe('Start Category Test', () => {
             async () => await Promise.resolve(categoryMockResponse.data),
           );
 
-        const result = await categoryService.create(categoryResponse.data);
+        const result = await categoryService.create(
+          categoryResponse.data,
+          fileMock,
+        );
 
         // Assert
         expect(result.data).toEqual(categoryMockResponse.data);
@@ -144,18 +175,20 @@ describe('Start Category Test', () => {
 
     describe('update use cases', () => {
       it('should update a category', async () => {
-        const updatecategory = {
+        const updateCategory = {
           ...categoryMock,
           name: 'womens',
+          file: fileMock,
         };
 
         const category = {
           name: 'womens',
+          file: fileMock,
         };
 
         jest.spyOn(repository, 'findOneById').mockResolvedValue(categoryMock);
 
-        jest.spyOn(repository, 'update').mockResolvedValue(updatecategory);
+        jest.spyOn(repository, 'update').mockResolvedValue(updateCategory);
 
         const result = await categoryService.update(categoryMock._id, category);
 
@@ -170,15 +203,22 @@ describe('Start Category Test', () => {
 
     describe('delete use cases', () => {
       it('should delete a category', async () => {
-        jest.spyOn(repository, 'findOneById').mockResolvedValue(categoryMock);
+        const deleteCategoryMock = {
+          ...categoryMock,
+          file: null,
+        };
 
-        jest.spyOn(repository, 'delete').mockResolvedValue(categoryMock);
+        jest
+          .spyOn(repository, 'findOneById')
+          .mockResolvedValue(deleteCategoryMock);
 
-        const result = await categoryService.remove(categoryMock._id);
+        jest.spyOn(repository, 'delete').mockResolvedValue(deleteCategoryMock);
+
+        const result = await categoryService.remove(deleteCategoryMock._id);
 
         // Assert
-        expect(repository.delete).toHaveBeenCalledWith(categoryMock._id);
-        expect(result.data['_id']).toEqual(categoryMock._id);
+        expect(repository.delete).toHaveBeenCalledWith(deleteCategoryMock._id);
+        expect(result.data['_id']).toEqual(deleteCategoryMock._id);
       });
     });
   });
@@ -208,7 +248,7 @@ describe('Start Category Test', () => {
 
         // Assert
         await expect(
-          categoryService.create(categoryResponse.data),
+          categoryService.create(categoryResponse.data, fileMock),
         ).rejects.toThrow(CustomErrorException);
       });
     });

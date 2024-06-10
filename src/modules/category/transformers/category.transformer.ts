@@ -14,7 +14,7 @@ export class CategoryTransformer extends Transformer {
     return {
       _id: category._id,
       name: category.name,
-      file: await this.validate(category.file, this.fileTransformer),
+      file: await this.validate(category?.file, this.fileTransformer),
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
     };

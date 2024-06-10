@@ -13,8 +13,8 @@ export class Category implements ICategory {
   })
   name: string;
 
-  @Prop({ type: FileSchema })
-  file: IFile;
+  @Prop({ type: FileSchema, required: false })
+  file?: IFile;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

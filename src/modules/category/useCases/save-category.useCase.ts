@@ -3,7 +3,7 @@ import { CategoryRepository } from '../repositories';
 import { CreateCategoryDto } from '../dto';
 import { Category } from '../schemas';
 import { errorInstaceOf } from '@src/shared';
-import { SaveFileUseCase } from '@src/modules/file/useCases';
+import { SaveFileUseCase } from '@src/modules/file';
 import { IFile } from '@src/modules/file';
 
 @Injectable()
@@ -32,7 +32,11 @@ export class SaveCategoryUseCase {
         );
       }
 
-      const saveImage: IFile = await this.saveFileUseCase.saveFile(image);
+      let saveImage: IFile;
+
+      if (image) {
+        saveImage = await this.saveFileUseCase.saveFile(image);
+      }
 
       let category = await this.repository.create({
         ...data,

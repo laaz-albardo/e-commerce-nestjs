@@ -28,7 +28,7 @@ export class CategoryController {
   @HttpCode(HttpStatus.CREATED)
   create(
     @Body() createCategoryDto: CreateCategoryDto,
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFile() image?: Express.Multer.File,
   ) {
     return this.categoryService.create(createCategoryDto, image);
   }
@@ -45,11 +45,13 @@ export class CategoryController {
 
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Patch(':id')
+  @UseInterceptors(MulterStorage)
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
+    @UploadedFile() image?: Express.Multer.File,
   ) {
-    return this.categoryService.update(id, updateCategoryDto);
+    return this.categoryService.update(id, updateCategoryDto, image);
   }
 
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)

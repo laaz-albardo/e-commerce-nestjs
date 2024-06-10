@@ -51,10 +51,15 @@ export class CategoryService {
     return this.response.send(data, HttpStatus.OK, new CategoryTransformer());
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+    image?: Express.Multer.File,
+  ) {
     const data = await this.updateCategoryUseCase.updateCategory(
       id,
       updateCategoryDto,
+      image,
     );
 
     return this.response.send(

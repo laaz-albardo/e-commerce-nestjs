@@ -29,14 +29,15 @@ describe('Start Category Test', () => {
 
   const response: any = new BaseResponse();
 
-  const categoryMock: any = {
-    _id: new mongoose.Types.ObjectId(),
-    name: 'mens',
-  };
-
   const fileMock: any = {
     _id: new mongoose.Types.ObjectId(),
     route: uuidV4(),
+  };
+
+  const categoryMock: any = {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'mens',
+    file: fileMock,
   };
 
   beforeEach(async () => {
@@ -174,18 +175,20 @@ describe('Start Category Test', () => {
 
     describe('update use cases', () => {
       it('should update a category', async () => {
-        const updatecategory = {
+        const updateCategory = {
           ...categoryMock,
           name: 'womens',
+          file: fileMock,
         };
 
         const category = {
           name: 'womens',
+          file: fileMock,
         };
 
         jest.spyOn(repository, 'findOneById').mockResolvedValue(categoryMock);
 
-        jest.spyOn(repository, 'update').mockResolvedValue(updatecategory);
+        jest.spyOn(repository, 'update').mockResolvedValue(updateCategory);
 
         const result = await categoryService.update(categoryMock._id, category);
 
@@ -200,15 +203,22 @@ describe('Start Category Test', () => {
 
     describe('delete use cases', () => {
       it('should delete a category', async () => {
-        jest.spyOn(repository, 'findOneById').mockResolvedValue(categoryMock);
+        const deleteCategoryMock = {
+          ...categoryMock,
+          file: null,
+        };
 
-        jest.spyOn(repository, 'delete').mockResolvedValue(categoryMock);
+        jest
+          .spyOn(repository, 'findOneById')
+          .mockResolvedValue(deleteCategoryMock);
 
-        const result = await categoryService.remove(categoryMock._id);
+        jest.spyOn(repository, 'delete').mockResolvedValue(deleteCategoryMock);
+
+        const result = await categoryService.remove(deleteCategoryMock._id);
 
         // Assert
-        expect(repository.delete).toHaveBeenCalledWith(categoryMock._id);
-        expect(result.data['_id']).toEqual(categoryMock._id);
+        expect(repository.delete).toHaveBeenCalledWith(deleteCategoryMock._id);
+        expect(result.data['_id']).toEqual(deleteCategoryMock._id);
       });
     });
   });

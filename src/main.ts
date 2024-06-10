@@ -23,7 +23,7 @@ async function bootstrap() {
 
   // Cors
   app.enableCors({
-    origin: '*',
+    origin: ['http://localhost:3000', 'https://parrella.vercel.app'],
     credentials: true,
   });
 

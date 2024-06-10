@@ -6,6 +6,8 @@ import { CategoryDocument } from '../types';
 import { Category } from '../schemas';
 import { errorInstaceOf } from '@src/shared';
 import { isNotEmpty } from 'class-validator';
+import { IFile, SaveFileUseCase } from '@src/modules/file';
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class UpdateCategoryUseCase {
@@ -14,11 +16,13 @@ export class UpdateCategoryUseCase {
   constructor(
     private readonly repository: CategoryRepository,
     private readonly getCategoryUseCase: GetCategoryUseCase,
+    private readonly saveFileUseCase: SaveFileUseCase,
   ) {}
 
   async updateCategory(
     _id: string,
     data: UpdateCategoryDto,
+    image?: Express.Multer.File,
   ): Promise<Category> {
     try {
       this.logger.log('update category...');
@@ -41,10 +45,20 @@ export class UpdateCategoryUseCase {
         }
       }
 
-      const updateCategory = await this.repository.update(
-        _id,
-        data as CategoryDocument,
-      );
+      let updateImage: IFile = validateCategory?.file;
+
+      if (image) {
+        updateImage = await this.saveFileUseCase.saveFile(image);
+
+        if (validateCategory.file) {
+          unlinkSync(validateCategory.file.route);
+        }
+      }
+
+      const updateCategory = await this.repository.update(_id, {
+        ...data,
+        file: updateImage,
+      } as CategoryDocument);
 
       this.logger.log('category updated successfully');
 

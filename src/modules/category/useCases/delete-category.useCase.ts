@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CategoryRepository } from '../repositories';
 import { GetCategoryUseCase } from './get-category.useCase';
 import { errorInstaceOf } from '@src/shared';
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class DeleteCategoryUseCase {
@@ -19,6 +20,10 @@ export class DeleteCategoryUseCase {
       await this.getCategoryUseCase.getCategoryById(_id);
 
       const deleteCategory = await this.repository.delete(_id);
+
+      if (deleteCategory.file) {
+        unlinkSync(deleteCategory.file.route);
+      }
 
       this.logger.log('category deleted successfully');
 

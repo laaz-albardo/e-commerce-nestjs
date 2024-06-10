@@ -16,9 +16,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CategoryTransformer } from '../transformers';
+import { FileModule, SaveFileUseCase } from '@src/modules/file';
+import { MongooseConfigTest } from '@src/config';
+import { ConfigModule } from '@nestjs/config';
+import { v4 as uuidV4 } from 'uuid';
+import { getConnectionToken } from '@nestjs/mongoose';
 
 describe('Start Category Test', () => {
-  let categoryService: CategoryService, repository: CategoryRepository;
+  let categoryService: CategoryService,
+    repository: CategoryRepository,
+    connection: mongoose.Connection;
 
   const response: any = new BaseResponse();
 
@@ -27,8 +34,21 @@ describe('Start Category Test', () => {
     name: 'mens',
   };
 
+  const fileMock: any = {
+    _id: new mongoose.Types.ObjectId(),
+    route: uuidV4(),
+  };
+
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
+      imports: [
+        FileModule,
+        MongooseConfigTest,
+        ConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath: '.env',
+        }),
+      ],
       providers: [
         CategoryService,
         SaveCategoryUseCase,
@@ -36,6 +56,7 @@ describe('Start Category Test', () => {
         GetCategoryUseCase,
         UpdateCategoryUseCase,
         DeleteCategoryUseCase,
+        SaveFileUseCase,
         {
           provide: CategoryRepository,
           useValue: {
@@ -51,12 +72,18 @@ describe('Start Category Test', () => {
       ],
     }).compile();
 
+    connection = await app.get(getConnectionToken());
     categoryService = app.get<CategoryService>(CategoryService);
     repository = app.get<CategoryRepository>(CategoryRepository);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  afterAll(async () => {
+    await connection.dropDatabase();
+    await connection.close();
   });
 
   describe('initialize category services', () => {
@@ -108,7 +135,10 @@ describe('Start Category Test', () => {
             async () => await Promise.resolve(categoryMockResponse.data),
           );
 
-        const result = await categoryService.create(categoryResponse.data);
+        const result = await categoryService.create(
+          categoryResponse.data,
+          fileMock,
+        );
 
         // Assert
         expect(result.data).toEqual(categoryMockResponse.data);
@@ -208,7 +238,7 @@ describe('Start Category Test', () => {
 
         // Assert
         await expect(
-          categoryService.create(categoryResponse.data),
+          categoryService.create(categoryResponse.data, fileMock),
         ).rejects.toThrow(CustomErrorException);
       });
     });

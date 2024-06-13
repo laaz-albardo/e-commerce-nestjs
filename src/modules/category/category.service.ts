@@ -22,8 +22,14 @@ export class CategoryService {
     private readonly deleteCategoryUseCase: DeleteCategoryUseCase,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto) {
-    const data = await this.saveCategoryUseCase.saveCategory(createCategoryDto);
+  async create(
+    createCategoryDto: CreateCategoryDto,
+    image: Express.Multer.File,
+  ) {
+    const data = await this.saveCategoryUseCase.saveCategory(
+      createCategoryDto,
+      image,
+    );
 
     return this.response.send(
       data,
@@ -44,10 +50,15 @@ export class CategoryService {
     return this.response.send(data, HttpStatus.OK, new CategoryTransformer());
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+    image?: Express.Multer.File,
+  ) {
     const data = await this.updateCategoryUseCase.updateCategory(
       id,
       updateCategoryDto,
+      image,
     );
 
     return this.response.send(

@@ -4,6 +4,7 @@ import { MongooseConfig } from './config';
 import {
   AuthModule,
   CategoryModule,
+  FileModule,
   MailModule,
   ProductModule,
   SeederModule,
@@ -24,6 +25,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     SeederModule,
     MailModule,
     CategoryModule,
+    FileModule,
     ProductModule,
   ],
 })

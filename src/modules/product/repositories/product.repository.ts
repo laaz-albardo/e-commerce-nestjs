@@ -17,6 +17,6 @@ export class ProductRepository extends BaseMongoDbRepository<ProductDocument> {
   }
 
   async findAll(): Promise<ProductDocument[]> {
-    return await this.repository.find().exec();
+    return await this.repository.find().populate('category').exec();
   }
 }

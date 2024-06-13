@@ -5,7 +5,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Product, ProductSchema } from './schemas';
 import { ProductRepository } from './repositories';
 import { FileModule } from '../file';
-import { SaveProductUseCase } from './useCases';
+import {
+  GetProductUseCase,
+  ListProductsUseCase,
+  SaveProductUseCase,
+} from './useCases';
 import { CategoryModule } from '../category';
 
 @Module({
@@ -15,6 +19,12 @@ import { CategoryModule } from '../category';
     CategoryModule,
   ],
   controllers: [ProductController],
-  providers: [ProductService, ProductRepository, SaveProductUseCase],
+  providers: [
+    ProductService,
+    ProductRepository,
+    SaveProductUseCase,
+    ListProductsUseCase,
+    GetProductUseCase,
+  ],
 })
 export class ProductModule {}

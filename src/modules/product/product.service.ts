@@ -1,14 +1,22 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { BaseResponse } from '@src/shared';
-import { SaveProductUseCase } from './useCases';
+import {
+  GetProductUseCase,
+  ListProductsUseCase,
+  SaveProductUseCase,
+} from './useCases';
 import { ProductTransformer } from './transformers';
 
 @Injectable()
 export class ProductService {
   private readonly response: BaseResponse = new BaseResponse();
 
-  constructor(private readonly saveProductUseCase: SaveProductUseCase) {}
+  constructor(
+    private readonly saveProductUseCase: SaveProductUseCase,
+    private readonly listProductsUseCase: ListProductsUseCase,
+    private readonly getProductUseCase: GetProductUseCase,
+  ) {}
 
   async create(
     createProductDto: CreateProductDto,
@@ -26,12 +34,16 @@ export class ProductService {
     );
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll() {
+    const data = await this.listProductsUseCase.listUsers();
+
+    return this.response.send(data, HttpStatus.OK, new ProductTransformer());
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string) {
+    const data = await this.getProductUseCase.getProductById(id);
+
+    return this.response.send(data, HttpStatus.OK, new ProductTransformer());
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {

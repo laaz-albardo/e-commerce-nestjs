@@ -1,9 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseConfig } from './config';
-import { AuthModule, MailModule, SeederModule, UserModule } from './modules';
+import {
+  AuthModule,
+  CategoryModule,
+  MailModule,
+  ProductModule,
+  SeederModule,
+  UserModule,
+} from './modules';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -18,6 +24,7 @@ import { CategoryModule } from './modules/category/category.module';
     SeederModule,
     MailModule,
     CategoryModule,
+    ProductModule,
   ],
 })
 export class AppModule {}

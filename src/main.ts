@@ -16,13 +16,16 @@ async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
-    {
-      cors: true,
-    },
   );
 
   // Global prefix
   app.setGlobalPrefix('api');
+
+  // Cors
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+  });
 
   // use validators containers
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -39,7 +42,7 @@ async function bootstrap() {
     prefix: '/public/',
   });
 
-  await app.listen(process.env.SERVER_PORT);
+  await app.listen(process.env.SERVER_PORT, '0.0.0.0');
   Logger.log(
     `Welcome to ${process.env.PRODUCT_NAME}, Server run on http://127.0.0.1:${process.env.SERVER_PORT}/api`,
   );

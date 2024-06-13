@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IFile } from '../interfaces';
 
-@Schema({ timestamps: true })
+@Schema({ autoCreate: false, autoIndex: false })
 export class File implements IFile {
   @Prop({ type: String, required: true, unique: true })
   route: string;

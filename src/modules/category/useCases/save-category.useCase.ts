@@ -3,14 +3,22 @@ import { CategoryRepository } from '../repositories';
 import { CreateCategoryDto } from '../dto';
 import { Category } from '../schemas';
 import { errorInstaceOf } from '@src/shared';
+import { SaveFileUseCase } from '@src/modules/file';
+import { IFile } from '@src/modules/file';
 
 @Injectable()
 export class SaveCategoryUseCase {
   private readonly logger = new Logger(CategoryRepository.name);
 
-  constructor(private readonly repository: CategoryRepository) {}
+  constructor(
+    private readonly repository: CategoryRepository,
+    private readonly saveFileUseCase: SaveFileUseCase,
+  ) {}
 
-  async saveCategory(data: CreateCategoryDto): Promise<Category> {
+  async saveCategory(
+    data: CreateCategoryDto,
+    image: Express.Multer.File,
+  ): Promise<Category> {
     try {
       this.logger.log('creating category...');
 
@@ -24,7 +32,16 @@ export class SaveCategoryUseCase {
         );
       }
 
-      let category = await this.repository.create(data);
+      let saveImage: IFile;
+
+      if (image) {
+        saveImage = await this.saveFileUseCase.saveFile(image);
+      }
+
+      let category = await this.repository.create({
+        ...data,
+        file: saveImage,
+      });
 
       category = await this.repository.save(category);
 

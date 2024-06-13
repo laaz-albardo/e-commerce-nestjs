@@ -7,6 +7,7 @@ declare namespace NodeJS {
     ENCRYPTION_DEFAULT: string;
     TZ: string;
     NODE_ENV: string;
+    SERVER_HOST: string;
     SERVER_PORT: number;
     SERVER_TEST_PORT: number;
     MONGODB_HOST: string;
@@ -24,5 +25,9 @@ declare namespace NodeJS {
     SMTP_SECURE_SSL: boolean;
     SMTP_SENDER_NAME: string;
     SMTP_SENDER_EMAIL_DEFAULT: string;
+    CLOUDINARY: boolean;
+    CLOUDINARY_NAME: string;
+    CLOUDINARY_API_KEY: string;
+    CLOUDINARY_API_SECRET: string;
   }
 }

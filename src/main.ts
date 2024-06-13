@@ -7,18 +7,25 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { useContainer } from 'class-validator';
+import compression from '@fastify/compress';
+import fastifyCookie from '@fastify/cookie';
+import { contentParser } from 'fastify-file-interceptor';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
-    {
-      cors: true,
-    },
   );
 
   // Global prefix
   app.setGlobalPrefix('api');
+
+  // Cors
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+  });
 
   // use validators containers
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -26,7 +33,16 @@ async function bootstrap() {
   // Validations
   app.useGlobalPipes(ClassValidatorConfig);
 
-  await app.listen(process.env.SERVER_PORT);
+  await app.register(compression);
+  await app.register(fastifyCookie, { parseOptions: { httpOnly: true } });
+  await app.register(contentParser);
+
+  app.useStaticAssets({
+    root: join(__dirname, '..', 'public'),
+    prefix: '/public/',
+  });
+
+  await app.listen(process.env.SERVER_PORT, '0.0.0.0');
   Logger.log(
     `Welcome to ${process.env.PRODUCT_NAME}, Server run on http://127.0.0.1:${process.env.SERVER_PORT}/api`,
   );

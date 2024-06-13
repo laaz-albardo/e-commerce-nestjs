@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IProduct } from '../interfaces';
-import { CategorySchema, ICategory } from '@src/modules/category';
+import { Category, ICategory } from '@src/modules/category';
 import { FileSchema, IFile } from '@src/modules/file';
+import { Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Product implements IProduct {
@@ -20,10 +21,10 @@ export class Product implements IProduct {
   @Prop({ type: Boolean, required: true })
   enable: boolean;
 
-  @Prop({ type: CategorySchema, required: true })
+  @Prop({ type: Types.ObjectId, ref: Category.name, required: true })
   category: ICategory;
 
-  @Prop({ type: FileSchema, required: false })
+  @Prop({ type: [{ type: FileSchema, required: false }] })
   files?: IFile[] | null;
 }
 

@@ -4,6 +4,7 @@ export * from './repositories';
 export * from './schemas';
 export * from './transformers';
 export * from './types';
+export * from './useCases';
 export * from './product.controller';
 export * from './product.module';
 export * from './product.service';

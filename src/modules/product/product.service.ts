@@ -1,10 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './dto';
+import { BaseResponse } from '@src/shared';
+import { SaveProductUseCase } from './useCases';
+import { ProductTransformer } from './transformers';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  private readonly response: BaseResponse = new BaseResponse();
+
+  constructor(private readonly saveProductUseCase: SaveProductUseCase) {}
+
+  async create(
+    createProductDto: CreateProductDto,
+    images?: Array<Express.Multer.File>,
+  ) {
+    const data = await this.saveProductUseCase.saveProduct(
+      createProductDto,
+      images,
+    );
+
+    return this.response.send(
+      data,
+      HttpStatus.CREATED,
+      new ProductTransformer(),
+    );
   }
 
   findAll() {

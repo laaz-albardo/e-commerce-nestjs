@@ -6,17 +6,30 @@ import {
   Patch,
   Param,
   Delete,
+  UploadedFiles,
+  HttpStatus,
+  HttpCode,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
+import { MulterMultiStorage } from '@src/config';
+import { Auth } from '../auth';
+import { UserRoleEnum } from '../user';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  @UseInterceptors(MulterMultiStorage)
+  @HttpCode(HttpStatus.CREATED)
+  create(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFiles() images: Array<Express.Multer.File>,
+  ) {
+    return this.productService.create(createProductDto, images);
   }
 
   @Get()

@@ -41,7 +41,7 @@ export class ProductController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
-    return this.productService.findOne(id);
+    return this.productService.findOneById(id);
   }
 
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)

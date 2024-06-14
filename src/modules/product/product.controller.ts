@@ -56,8 +56,10 @@ export class ProductController {
     return this.productService.update(id, updateProductDto, images);
   }
 
+  @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Delete(':id')
+  @HttpCode(HttpStatus.ACCEPTED)
   remove(@Param('id') id: string) {
-    return this.productService.remove(+id);
+    return this.productService.remove(id);
   }
 }

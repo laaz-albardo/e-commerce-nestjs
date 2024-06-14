@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { BaseResponse } from '@src/shared';
 import {
+  DeleteProductUseCase,
   GetProductUseCase,
   ListProductsUseCase,
   SaveProductUseCase,
@@ -18,6 +19,7 @@ export class ProductService {
     private readonly listProductsUseCase: ListProductsUseCase,
     private readonly getProductUseCase: GetProductUseCase,
     private readonly updateProductUseCase: UpdateProductUseCase,
+    private readonly deleteProductUseCase: DeleteProductUseCase,
   ) {}
 
   async create(
@@ -61,12 +63,18 @@ export class ProductService {
 
     return this.response.send(
       data,
-      HttpStatus.CREATED,
+      HttpStatus.ACCEPTED,
       new ProductTransformer(),
     );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    const data = await this.deleteProductUseCase.deleteProduct(id);
+
+    return this.response.send(
+      data,
+      HttpStatus.ACCEPTED,
+      new ProductTransformer(),
+    );
   }
 }

@@ -9,6 +9,7 @@ import {
   GetProductUseCase,
   ListProductsUseCase,
   SaveProductUseCase,
+  UpdateProductUseCase,
 } from './useCases';
 import { CategoryModule } from '../category';
 
@@ -25,6 +26,7 @@ import { CategoryModule } from '../category';
     SaveProductUseCase,
     ListProductsUseCase,
     GetProductUseCase,
+    UpdateProductUseCase,
   ],
 })
 export class ProductModule {}

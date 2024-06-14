@@ -5,6 +5,7 @@ import {
   GetProductUseCase,
   ListProductsUseCase,
   SaveProductUseCase,
+  UpdateProductUseCase,
 } from './useCases';
 import { ProductTransformer } from './transformers';
 
@@ -16,6 +17,7 @@ export class ProductService {
     private readonly saveProductUseCase: SaveProductUseCase,
     private readonly listProductsUseCase: ListProductsUseCase,
     private readonly getProductUseCase: GetProductUseCase,
+    private readonly updateProductUseCase: UpdateProductUseCase,
   ) {}
 
   async create(
@@ -46,8 +48,22 @@ export class ProductService {
     return this.response.send(data, HttpStatus.OK, new ProductTransformer());
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+    images?: Array<Express.Multer.File>,
+  ) {
+    const data = await this.updateProductUseCase.updateProduct(
+      id,
+      updateProductDto,
+      images,
+    );
+
+    return this.response.send(
+      data,
+      HttpStatus.CREATED,
+      new ProductTransformer(),
+    );
   }
 
   remove(id: number) {

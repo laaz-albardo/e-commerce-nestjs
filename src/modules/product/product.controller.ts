@@ -44,9 +44,16 @@ export class ProductController {
     return this.productService.findOne(id);
   }
 
+  @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+  @UseInterceptors(MulterMultiStorage)
+  @HttpCode(HttpStatus.ACCEPTED)
+  update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFiles() images: Array<Express.Multer.File>,
+  ) {
+    return this.productService.update(id, updateProductDto, images);
   }
 
   @Delete(':id')

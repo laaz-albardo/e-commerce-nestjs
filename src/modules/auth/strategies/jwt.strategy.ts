@@ -5,6 +5,7 @@ import { GetUserUseCase } from '@src/modules/user';
 import { IJWTPayload } from '../interfaces';
 import { errorInstaceOf } from '@src/shared';
 import { ConfigService } from '@nestjs/config';
+import { FastifyRequest } from 'fastify';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -15,10 +16,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly config: ConfigService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        JwtStrategy.extractJWTFromCookie,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: config.getOrThrow('JWT_SECRET'),
     });
+  }
+
+  private static extractJWTFromCookie(req: FastifyRequest): string | null {
+    if (req.cookies && req.cookies.token && req.cookies.token.length > 0) {
+      return req.cookies.token;
+    }
+    return null;
   }
 
   async validate(payload: IJWTPayload) {

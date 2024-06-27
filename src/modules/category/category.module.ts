@@ -30,5 +30,6 @@ import { FileModule } from '../file';
     UpdateCategoryUseCase,
     DeleteCategoryUseCase,
   ],
+  exports: [CategoryRepository, GetCategoryUseCase],
 })
 export class CategoryModule {}

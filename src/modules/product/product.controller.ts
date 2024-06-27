@@ -10,6 +10,9 @@ import {
   HttpStatus,
   HttpCode,
   UseInterceptors,
+  Query,
+  ParseFloatPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
@@ -34,8 +37,29 @@ export class ProductController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll() {
-    return this.productService.findAll();
+  findAll(
+    @Query('name') name?: string,
+    @Query('minPrice', new ParseFloatPipe({ optional: true }))
+    minPrice?: number,
+    @Query('maxPrice', new ParseFloatPipe({ optional: true }))
+    maxPrice?: number,
+    @Query('category') category?: string,
+    @Query('orderByName', new ParseIntPipe({ optional: true }))
+    orderByName?: number,
+    @Query('orderByPrice', new ParseIntPipe({ optional: true }))
+    orderByPrice?: number,
+    @Query('orderByCreatedAt', new ParseIntPipe({ optional: true }))
+    orderByCreatedAt?: number,
+  ) {
+    return this.productService.findAll(
+      name,
+      minPrice,
+      maxPrice,
+      category,
+      orderByName,
+      orderByPrice,
+      orderByCreatedAt,
+    );
   }
 
   @Get(':id')

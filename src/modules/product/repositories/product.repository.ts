@@ -16,7 +16,55 @@ export class ProductRepository extends BaseMongoDbRepository<ProductDocument> {
     return new this.repository(data);
   }
 
-  async findAll(): Promise<ProductDocument[]> {
-    return await this.repository.find().populate('category').exec();
+  async findAll(
+    name?: string,
+    minPrice?: number,
+    maxPrice?: number,
+    category?: string,
+    orderByName?: number,
+    orderByPrice?: number,
+    orderByCreatedAt?: number,
+  ): Promise<ProductDocument[]> {
+    const query = this.repository;
+
+    const filter = {};
+
+    const sortFilter = {};
+
+    if (name) {
+      filter['name'] = { $regex: '.*' + name + '.*' };
+    }
+
+    if (minPrice || maxPrice) {
+      filter['price'] = {};
+
+      if (minPrice) {
+        filter['price']['$gte'] = minPrice;
+      }
+
+      if (maxPrice) {
+        filter['price']['$lte'] = maxPrice;
+      }
+    }
+
+    if (category) {
+      filter['category'] = { $in: category };
+    }
+
+    if (orderByName) {
+      sortFilter['name'] = orderByName;
+    }
+
+    if (orderByPrice) {
+      sortFilter['price'] = orderByPrice;
+    }
+
+    sortFilter['createdAt'] = orderByCreatedAt ?? -1;
+
+    return await query
+      .find(filter)
+      .sort(sortFilter)
+      .populate('category')
+      .exec();
   }
 }

@@ -9,16 +9,33 @@ export class ListProductsUseCase {
 
   constructor(private readonly repository: ProductRepository) {}
 
-  async listUsers(): Promise<ProductDocument[]> {
+  async listUsers(
+    name?: string,
+    minPrice?: number,
+    maxPrice?: number,
+    category?: string,
+    orderByName?: number,
+    orderByPrice?: number,
+    orderByCreatedAt?: number,
+  ): Promise<ProductDocument[]> {
     try {
       this.logger.log('list products...');
 
-      const products = await this.repository.findAll();
+      const products = await this.repository.findAll(
+        name,
+        minPrice,
+        maxPrice,
+        category,
+        orderByName,
+        orderByPrice,
+        orderByCreatedAt,
+      );
 
       this.logger.log('products listed successfully');
 
       return products;
     } catch (err) {
+      console.log(err);
       throw errorInstaceOf(err);
     }
   }

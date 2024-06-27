@@ -38,8 +38,24 @@ export class ProductService {
     );
   }
 
-  async findAll() {
-    const data = await this.listProductsUseCase.listUsers();
+  async findAll(
+    name?: string,
+    minPrice?: number,
+    maxPrice?: number,
+    category?: string,
+    orderByName?: number,
+    orderByPrice?: number,
+    orderByCreatedAt?: number,
+  ) {
+    const data = await this.listProductsUseCase.listUsers(
+      name,
+      minPrice,
+      maxPrice,
+      category,
+      orderByName,
+      orderByPrice,
+      orderByCreatedAt,
+    );
 
     return this.response.send(data, HttpStatus.OK, new ProductTransformer());
   }

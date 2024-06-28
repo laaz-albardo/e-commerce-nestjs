@@ -16,7 +16,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest<FastifyRequest>();
 
-    const token = this.extractTokenFromCookies(request);
+    const token = request.cookies?.token;
 
     if (token) {
       return super.canActivate(context);
@@ -38,15 +38,5 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     return user;
-  }
-
-  private extractTokenFromCookies(request: FastifyRequest): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-
-    return type === 'Bearer' &&
-      request.cookies?.token &&
-      token === request.cookies.token
-      ? request.cookies.token
-      : undefined;
   }
 }

@@ -19,6 +19,7 @@ import { CreateProductDto, UpdateProductDto } from './dto';
 import { MulterMultiStorage } from '@src/config';
 import { Auth } from '../auth';
 import { UserRoleEnum } from '../user';
+import { ParseMongoIdPipe } from '@src/shared';
 
 @Controller('product')
 export class ProductController {
@@ -43,7 +44,8 @@ export class ProductController {
     minPrice?: number,
     @Query('maxPrice', new ParseFloatPipe({ optional: true }))
     maxPrice?: number,
-    @Query('category') category?: string,
+    @Query('category', new ParseMongoIdPipe({ optional: true }))
+    category?: string,
     @Query('orderByName', new ParseIntPipe({ optional: true }))
     orderByName?: number,
     @Query('orderByPrice', new ParseIntPipe({ optional: true }))
@@ -64,7 +66,7 @@ export class ProductController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseMongoIdPipe()) id: string) {
     return this.productService.findOneById(id);
   }
 
@@ -73,7 +75,7 @@ export class ProductController {
   @UseInterceptors(MulterMultiStorage)
   @HttpCode(HttpStatus.ACCEPTED)
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseMongoIdPipe()) id: string,
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() images: Array<Express.Multer.File>,
   ) {
@@ -83,7 +85,7 @@ export class ProductController {
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.ACCEPTED)
-  remove(@Param('id') id: string) {
+  remove(@Param('id', new ParseMongoIdPipe()) id: string) {
     return this.productService.remove(id);
   }
 }

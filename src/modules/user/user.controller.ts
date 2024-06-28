@@ -15,6 +15,7 @@ import { UserService } from './user.service';
 import { Auth, AuthAll } from '@src/modules/auth';
 import { UserRoleEnum } from './enums';
 import { FastifyRequest } from 'fastify';
+import { ParseMongoIdPipe } from '@src/shared';
 
 @Controller('user')
 export class UserController {
@@ -43,7 +44,7 @@ export class UserController {
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseMongoIdPipe()) id: string) {
     return this.userService.findOneById(id);
   }
 
@@ -77,7 +78,7 @@ export class UserController {
   @Auth(UserRoleEnum.SUPER_ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.ACCEPTED)
-  remove(@Param('id') id: string) {
+  remove(@Param('id', new ParseMongoIdPipe()) id: string) {
     return this.userService.remove(id);
   }
 }

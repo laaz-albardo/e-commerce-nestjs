@@ -25,9 +25,5 @@ declare namespace NodeJS {
     SMTP_SECURE_SSL: boolean;
     SMTP_SENDER_NAME: string;
     SMTP_SENDER_EMAIL_DEFAULT: string;
-    CLOUDINARY: boolean;
-    CLOUDINARY_NAME: string;
-    CLOUDINARY_API_KEY: string;
-    CLOUDINARY_API_SECRET: string;
   }
 }

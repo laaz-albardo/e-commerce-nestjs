@@ -12,8 +12,7 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 import { Auth } from '@src/modules/auth';
 import { UserRoleEnum } from '@src/modules/user';
 import { MulterStorage } from '@src/config';
@@ -34,11 +33,13 @@ export class CategoryController {
   }
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   findAll() {
     return this.categoryService.findAll();
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
     return this.categoryService.findOneById(id);
   }
@@ -46,6 +47,7 @@ export class CategoryController {
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Patch(':id')
   @UseInterceptors(MulterStorage)
+  @HttpCode(HttpStatus.ACCEPTED)
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -56,6 +58,7 @@ export class CategoryController {
 
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Delete(':id')
+  @HttpCode(HttpStatus.ACCEPTED)
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);
   }

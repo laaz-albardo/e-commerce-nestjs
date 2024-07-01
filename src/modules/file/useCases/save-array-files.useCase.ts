@@ -13,10 +13,10 @@ export class SaveArrayFilesUseCase {
     try {
       this.logger.log('creating files...');
 
-      const createFile = await this.repository.create();
       const results = [];
 
       for await (const image of data) {
+        const createFile = await this.repository.create();
         createFile.route = image.path;
         results.push(createFile);
       }

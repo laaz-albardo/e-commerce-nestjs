@@ -3,13 +3,14 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseConfig } from './config';
 import {
   AuthModule,
+  CategoryModule,
+  FileModule,
   MailModule,
+  ProductModule,
   SeederModule,
   UserModule,
-  FileModule,
 } from './modules';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CategoryModule } from './modules/category/category.module';
     MailModule,
     CategoryModule,
     FileModule,
+    ProductModule,
   ],
 })
 export class AppModule {}

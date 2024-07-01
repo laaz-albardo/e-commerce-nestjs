@@ -1,1 +1,1 @@
-export * from './category.interfaces';
+export * from './category.interface';

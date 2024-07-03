@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ProductRepository } from '../repositories';
 import { GetProductUseCase } from './get-product.useCase';
 import { errorInstaceOf } from '@src/shared';
-import { unlinkSync } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
 
 @Injectable()
 export class DeleteProductUseCase {
@@ -23,7 +23,9 @@ export class DeleteProductUseCase {
 
       if (deleteProduct.files.length > 0) {
         for await (const file of deleteProduct.files) {
-          unlinkSync(file.route);
+          if (existsSync(file.route)) {
+            unlinkSync(file.route);
+          }
         }
       }
 

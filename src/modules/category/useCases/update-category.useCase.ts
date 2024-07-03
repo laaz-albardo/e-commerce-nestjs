@@ -7,7 +7,7 @@ import { Category } from '../schemas';
 import { errorInstaceOf } from '@src/shared';
 import { isNotEmpty } from 'class-validator';
 import { IFile, SaveFileUseCase } from '@src/modules/file';
-import { unlinkSync } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
 
 @Injectable()
 export class UpdateCategoryUseCase {
@@ -50,7 +50,7 @@ export class UpdateCategoryUseCase {
       if (image) {
         updateImage = await this.saveFileUseCase.saveFile(image);
 
-        if (validateCategory.file) {
+        if (validateCategory.file && existsSync(validateCategory.file.route)) {
           unlinkSync(validateCategory.file.route);
         }
       }

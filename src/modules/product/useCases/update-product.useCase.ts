@@ -5,7 +5,7 @@ import { Product } from '../schemas';
 import { GetProductUseCase } from './get-product.useCase';
 import { IFile, SaveArrayFilesUseCase } from '@src/modules/file';
 import { isNotEmpty } from 'class-validator';
-import { unlinkSync } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
 import { ProductDocument } from '../types';
 import { CategoryDocument, GetCategoryUseCase } from '@src/modules/category';
 import { errorInstaceOf } from '@src/shared';
@@ -64,7 +64,9 @@ export class UpdateProductUseCase {
 
         if (validateProduct.files.length > 0) {
           for await (const file of validateProduct.files) {
-            unlinkSync(file.route);
+            if (existsSync(file.route)) {
+              unlinkSync(file.route);
+            }
           }
         }
       }

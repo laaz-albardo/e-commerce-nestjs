@@ -38,8 +38,8 @@ export class UserService {
     return this.response.send(data, HttpStatus.CREATED, new UserTransformer());
   }
 
-  async findAll() {
-    const data = await this.listUsersUseCase.listUsers();
+  async findAll(pagination?: boolean, page?: number, limit?: number) {
+    const data = await this.listUsersUseCase.listUsers(pagination, page, limit);
 
     return this.response.send(data, HttpStatus.OK, new UserTransformer());
   }

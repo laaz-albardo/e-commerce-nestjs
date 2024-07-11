@@ -9,11 +9,15 @@ export class ListCategoriesUseCase {
 
   constructor(private readonly repository: CategoryRepository) {}
 
-  async listUsers(): Promise<CategoryDocument[]> {
+  async listUsers(
+    pagination?: boolean,
+    page?: number,
+    limit?: number,
+  ): Promise<CategoryDocument[]> {
     try {
       this.logger.log('list categories...');
 
-      const categories = await this.repository.findAll();
+      const categories = await this.repository.findAll(pagination, page, limit);
 
       this.logger.log('categories listed successfully');
 

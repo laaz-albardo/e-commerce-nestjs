@@ -44,7 +44,7 @@ async function bootstrap() {
 
   await app.listen(process.env.SERVER_PORT, '0.0.0.0');
   Logger.log(
-    `Welcome to ${process.env.PRODUCT_NAME}, Server run on http://${process.env.SERVER_HOST}:${process.env.SERVER_PORT}/api`,
+    `Welcome to ${process.env.PRODUCT_NAME}, Server run on ${process.env.SERVER_HOST}:${process.env.SERVER_PORT}/api`,
   );
 }
 bootstrap();

@@ -16,6 +16,7 @@ import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 import { Auth } from '@src/modules/auth';
 import { UserRoleEnum } from '@src/modules/user';
 import { MulterStorage } from '@src/config';
+import { ParseMongoIdPipe } from '@src/shared';
 
 @Controller('category')
 export class CategoryController {
@@ -40,7 +41,7 @@ export class CategoryController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseMongoIdPipe()) id: string) {
     return this.categoryService.findOneById(id);
   }
 
@@ -49,7 +50,7 @@ export class CategoryController {
   @UseInterceptors(MulterStorage)
   @HttpCode(HttpStatus.ACCEPTED)
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseMongoIdPipe()) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
     @UploadedFile() image?: Express.Multer.File,
   ) {
@@ -59,7 +60,7 @@ export class CategoryController {
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Delete(':id')
   @HttpCode(HttpStatus.ACCEPTED)
-  remove(@Param('id') id: string) {
+  remove(@Param('id', new ParseMongoIdPipe()) id: string) {
     return this.categoryService.remove(id);
   }
 }

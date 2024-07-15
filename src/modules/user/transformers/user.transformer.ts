@@ -18,7 +18,6 @@ export class UserTransformer extends Transformer {
       person: await this.validate(user.person, this.personTransformer),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      deletedAt: user?.deletedAt,
     };
   }
 }

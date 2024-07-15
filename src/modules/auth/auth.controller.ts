@@ -12,9 +12,13 @@ import {
 import { AuthService } from './auth.service';
 import { IUser } from '../user';
 import { LocalAuthGuard } from './guards';
-import { AuthInterceptor, LoginInterceptor } from './interceptors';
+import {
+  AuthInterceptor,
+  LoginInterceptor,
+  LogoutInterceptor,
+} from './interceptors';
 import { AuthAll } from './decorators';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyRequest } from 'fastify';
 
 @Controller('auth')
 export class AuthController {
@@ -29,11 +33,10 @@ export class AuthController {
   }
 
   @AuthAll()
+  @UseInterceptors(LogoutInterceptor)
   @Post('logout')
   @HttpCode(HttpStatus.ACCEPTED)
-  singOut(@Res() res: FastifyReply) {
-    res.send({ statusCode: res.statusCode, data: { token: '' } });
-  }
+  singOut() {}
 
   @AuthAll()
   @UseInterceptors(AuthInterceptor)

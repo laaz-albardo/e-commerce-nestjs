@@ -11,6 +11,7 @@ import compression from '@fastify/compress';
 import fastifyCookie from '@fastify/cookie';
 import { contentParser } from 'fastify-file-interceptor';
 import { join } from 'path';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -33,8 +34,19 @@ async function bootstrap() {
   // Validations
   app.useGlobalPipes(ClassValidatorConfig);
 
+  // fastify cookies
+  app.use(cookieParser());
+  await app.register(fastifyCookie, {
+    parseOptions: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    },
+    secret: process.env.JWT_SECRET,
+  });
+
   await app.register(compression);
-  await app.register(fastifyCookie, { parseOptions: { httpOnly: true } });
   await app.register(contentParser);
 
   app.useStaticAssets({

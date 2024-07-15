@@ -7,37 +7,29 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IAuhtInterceptorResponse } from '../interfaces';
-import { AuthTransformer } from '../transformers';
 import { FastifyReply } from 'fastify';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class LoginInterceptor<T>
+export class LogoutInterceptor<T>
   implements
     NestInterceptor<T, Promise<IAuhtInterceptorResponse<FastifyReply>>>
 {
-  constructor(private readonly config: ConfigService) {}
-
   intercept(
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Promise<IAuhtInterceptorResponse<FastifyReply>>> {
     const res = context.switchToHttp().getResponse<FastifyReply>();
 
-    const expires = new Date(
-      Date.now() + Number(this.config.getOrThrow('JWT_EXPIRES') * 1000),
-    );
+    const expires = new Date(Date.now());
 
     return next.handle().pipe(
       map(
-        async (data) => (
-          res.setCookie('token', data.hash, {
-            expires,
-          }),
+        async () => (
+          res.clearCookie('token', { expires }),
           {
             statusCode: res.statusCode,
-            msg: 'Session started',
-            data: await new AuthTransformer().handle(data),
+            msg: 'Session end',
+            data: null as any,
             errors: null,
           }
         ),

@@ -59,7 +59,7 @@ export class ProductRepository extends BaseMongoDbRepository<ProductDocument> {
     }
 
     if (category) {
-      filter['category'] = { $in: category };
+      filter['category'] = category;
     }
 
     if (orderByName) {

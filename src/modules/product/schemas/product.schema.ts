@@ -3,6 +3,7 @@ import { IProduct } from '../interfaces';
 import { Category, ICategory } from '@src/modules/category';
 import { FileSchema, IFile } from '@src/modules/file';
 import { Types } from 'mongoose';
+import { ProductShirtSize } from '../enums';
 import paginate from 'mongoose-paginate-v2';
 
 @Schema({ timestamps: true })
@@ -15,6 +16,9 @@ export class Product implements IProduct {
 
   @Prop({ type: Number, required: true })
   stock: number;
+
+  @Prop({ type: [{ type: String, enum: ProductShirtSize, required: false }] })
+  size?: ProductShirtSize[] | null;
 
   @Prop({ type: Number, required: true })
   price: number;

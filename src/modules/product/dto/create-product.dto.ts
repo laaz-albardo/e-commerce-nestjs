@@ -1,6 +1,8 @@
 import {
+  isArray,
   IsArray,
   IsBooleanString,
+  IsEnum,
   IsInt,
   IsMongoId,
   IsNotEmpty,
@@ -15,6 +17,7 @@ import { IProduct } from '../interfaces';
 import { Transform } from 'class-transformer';
 import { IFile } from '@src/modules/file';
 import { ICategory } from '@src/modules/category';
+import { ProductShirtSize } from '../enums';
 
 export class CreateProductDto implements IProduct {
   @IsNotEmpty()
@@ -36,6 +39,14 @@ export class CreateProductDto implements IProduct {
   @Min(1)
   @Transform(({ value }) => Number(value), { toClassOnly: true })
   stock: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsEnum(ProductShirtSize, { each: true })
+  @Transform(({ value }) => (isArray(value) ? value : Array(value)), {
+    toClassOnly: true,
+  })
+  size?: ProductShirtSize[] | null;
 
   @IsNotEmpty()
   @IsNumber()

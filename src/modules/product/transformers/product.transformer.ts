@@ -19,6 +19,7 @@ export class ProductTransformer extends Transformer {
       name: product.name,
       description: product.description,
       stock: product.stock,
+      size: product?.size,
       price: product.price,
       enable: product.enable,
       category: await this.validate(product.category, this.categoryTransformer),

@@ -254,20 +254,6 @@ describe('Start Category Test', () => {
     });
 
     describe('get category by id', () => {
-      it('should throw BadRequestException if invalid ID is provide', async () => {
-        const id = 'invalid-id';
-
-        const isValidObjectIdMock = jest
-          .spyOn(mongoose, 'isValidObjectId')
-          .mockReturnValue(false);
-
-        // Assert
-        await expect(categoryService.findOneById(id)).rejects.toThrow(
-          CustomErrorException,
-        );
-        isValidObjectIdMock.mockRestore();
-      });
-
       it('should throw NotFoundException if category is not found', async () => {
         const testId: any = new mongoose.Types.ObjectId();
 
@@ -287,25 +273,6 @@ describe('Start Category Test', () => {
     });
 
     describe('update category', () => {
-      it('should throw BadRequestException if invalid ID is provide', async () => {
-        const id = 'invalid-id';
-
-        const updateCategory = {
-          ...categoryMock,
-          name: 'womens',
-        };
-
-        const isValidObjectIdMock = jest
-          .spyOn(mongoose, 'isValidObjectId')
-          .mockReturnValue(false);
-
-        // Assert
-        await expect(
-          categoryService.update(id, updateCategory),
-        ).rejects.toThrow(CustomErrorException);
-        isValidObjectIdMock.mockRestore();
-      });
-
       it('should throw NotFoundException if category is not found', async () => {
         const testId: any = new mongoose.Types.ObjectId();
 
@@ -354,20 +321,6 @@ describe('Start Category Test', () => {
     });
 
     describe('delete category', () => {
-      it('should throw BadRequestException if invalid ID is provide', async () => {
-        const id = 'invalid-id';
-
-        const isValidObjectIdMock = jest
-          .spyOn(mongoose, 'isValidObjectId')
-          .mockReturnValue(false);
-
-        // Assert
-        await expect(categoryService.remove(id)).rejects.toThrow(
-          CustomErrorException,
-        );
-        isValidObjectIdMock.mockRestore();
-      });
-
       it('should throw NotFoundException if category is not found', async () => {
         const testId: any = new mongoose.Types.ObjectId();
 

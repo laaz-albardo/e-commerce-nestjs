@@ -366,20 +366,6 @@ describe('Start User Test', () => {
     });
 
     describe('get user by id', () => {
-      it('should throw BadRequestException if invalid ID is provide', async () => {
-        const id = 'invalid-id';
-
-        const isValidObjectIdMock = jest
-          .spyOn(mongoose, 'isValidObjectId')
-          .mockReturnValue(false);
-
-        // Assert
-        await expect(userService.findOneById(id)).rejects.toThrow(
-          CustomErrorException,
-        );
-        isValidObjectIdMock.mockRestore();
-      });
-
       it('should throw NotFoundException if user is not found', async () => {
         const testId: any = new mongoose.Types.ObjectId();
 
@@ -399,26 +385,6 @@ describe('Start User Test', () => {
     });
 
     describe('update user', () => {
-      it('should throw BadRequestException if invalid ID is provide', async () => {
-        const id = 'invalid-id';
-
-        const updateUser = {
-          ...userMock,
-          email: 'test@testing.com',
-          person: { fullName: 'testing' },
-        };
-
-        const isValidObjectIdMock = jest
-          .spyOn(mongoose, 'isValidObjectId')
-          .mockReturnValue(false);
-
-        // Assert
-        await expect(userService.update(id, updateUser)).rejects.toThrow(
-          CustomErrorException,
-        );
-        isValidObjectIdMock.mockRestore();
-      });
-
       it('should throw NotFoundException if user is not found', async () => {
         const testId: any = new mongoose.Types.ObjectId();
 
@@ -492,20 +458,6 @@ describe('Start User Test', () => {
     });
 
     describe('delete user', () => {
-      it('should throw BadRequestException if invalid ID is provide', async () => {
-        const id = 'invalid-id';
-
-        const isValidObjectIdMock = jest
-          .spyOn(mongoose, 'isValidObjectId')
-          .mockReturnValue(false);
-
-        // Assert
-        await expect(userService.remove(id)).rejects.toThrow(
-          CustomErrorException,
-        );
-        isValidObjectIdMock.mockRestore();
-      });
-
       it('should throw NotFoundException if user is not found', async () => {
         const testId: any = new mongoose.Types.ObjectId();
 

@@ -3,6 +3,7 @@ import { IProduct } from '../interfaces';
 import { Category, ICategory } from '@src/modules/category';
 import { FileSchema, IFile } from '@src/modules/file';
 import { Types } from 'mongoose';
+import paginate from 'mongoose-paginate-v2';
 
 @Schema({ timestamps: true })
 export class Product implements IProduct {
@@ -29,3 +30,5 @@ export class Product implements IProduct {
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+ProductSchema.plugin(paginate);

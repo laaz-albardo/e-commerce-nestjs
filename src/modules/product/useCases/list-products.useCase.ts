@@ -17,6 +17,9 @@ export class ListProductsUseCase {
     orderByName?: number,
     orderByPrice?: number,
     orderByCreatedAt?: number,
+    pagination?: boolean,
+    page?: number,
+    limit?: number,
   ): Promise<ProductDocument[]> {
     try {
       this.logger.log('list products...');
@@ -29,6 +32,9 @@ export class ListProductsUseCase {
         orderByName,
         orderByPrice,
         orderByCreatedAt,
+        pagination,
+        page,
+        limit,
       );
 
       this.logger.log('products listed successfully');

@@ -9,6 +9,9 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  Query,
+  ParseBoolPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto, UpdateUserPasswordDto } from './dto';
 import { UserService } from './user.service';
@@ -37,8 +40,13 @@ export class UserController {
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll() {
-    return this.userService.findAll();
+  findAll(
+    @Query('pagination', new ParseBoolPipe({ optional: true }))
+    pagination?: boolean,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
+  ) {
+    return this.userService.findAll(pagination, page, limit);
   }
 
   @Auth(UserRoleEnum.SUPER_ADMIN, UserRoleEnum.ADMIN)

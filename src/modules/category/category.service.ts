@@ -38,8 +38,12 @@ export class CategoryService {
     );
   }
 
-  async findAll() {
-    const data = await this.listCategoriesUseCase.listUsers();
+  async findAll(pagination?: boolean, page?: number, limit?: number) {
+    const data = await this.listCategoriesUseCase.listUsers(
+      pagination,
+      page,
+      limit,
+    );
 
     return this.response.send(data, HttpStatus.OK, new CategoryTransformer());
   }

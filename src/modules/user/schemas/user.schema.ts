@@ -3,6 +3,7 @@ import { IPerson, IUser } from '../interfaces';
 import { PersonSchema } from './person.schema';
 import { genSalt, hash } from 'bcrypt';
 import { UserRoleEnum } from '../enums';
+import paginate from 'mongoose-paginate-v2';
 
 @Schema({ timestamps: true })
 export class User implements Partial<IUser> {
@@ -33,6 +34,8 @@ export class User implements Partial<IUser> {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.plugin(paginate);
 
 UserSchema.pre('save', async function (next) {
   if (this.isNew) {

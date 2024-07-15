@@ -3,13 +3,17 @@ import { User } from '../schemas';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserDocument } from '../types';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, PaginateModel, PaginateOptions } from 'mongoose';
 import { IUser } from '../interfaces';
 import { UserRoleEnum } from '../enums';
 
 @Injectable()
 export class UserRepository extends BaseMongoDbRepository<UserDocument> {
-  constructor(@InjectModel(User.name) repository: Model<UserDocument>) {
+  constructor(
+    @InjectModel(User.name) repository: Model<UserDocument>,
+    @InjectModel(User.name)
+    private readonly paginateRepository: PaginateModel<UserDocument>,
+  ) {
     super(User.name, repository);
   }
 
@@ -21,9 +25,24 @@ export class UserRepository extends BaseMongoDbRepository<UserDocument> {
     return await this.repository.insertMany(data);
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.repository
-      .find({ role: { $ne: UserRoleEnum.SUPER_ADMIN } })
-      .exec();
+  async findAll(
+    pagination?: boolean,
+    page?: number,
+    limit?: number,
+  ): Promise<User[] | any> {
+    const filters: FilterQuery<UserDocument> = {
+      role: { $ne: UserRoleEnum.SUPER_ADMIN },
+    };
+
+    const pageFilter: PaginateOptions = {
+      page: page ?? 1,
+      limit: limit ?? 10,
+    };
+
+    if (pagination) {
+      return await this.paginateRepository.paginate(filters, pageFilter);
+    }
+
+    return await this.repository.find(filters).exec();
   }
 }

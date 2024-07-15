@@ -13,6 +13,7 @@ import {
   Query,
   ParseFloatPipe,
   ParseIntPipe,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
@@ -52,6 +53,10 @@ export class ProductController {
     orderByPrice?: number,
     @Query('orderByCreatedAt', new ParseIntPipe({ optional: true }))
     orderByCreatedAt?: number,
+    @Query('pagination', new ParseBoolPipe({ optional: true }))
+    pagination?: boolean,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
   ) {
     return this.productService.findAll(
       name,
@@ -61,6 +66,9 @@ export class ProductController {
       orderByName,
       orderByPrice,
       orderByCreatedAt,
+      pagination,
+      page,
+      limit,
     );
   }
 

@@ -46,6 +46,9 @@ export class ProductService {
     orderByName?: number,
     orderByPrice?: number,
     orderByCreatedAt?: number,
+    pagination?: boolean,
+    page?: number,
+    limit?: number,
   ) {
     const data = await this.listProductsUseCase.listUsers(
       name,
@@ -55,6 +58,9 @@ export class ProductService {
       orderByName,
       orderByPrice,
       orderByCreatedAt,
+      pagination,
+      page,
+      limit,
     );
 
     return this.response.send(data, HttpStatus.OK, new ProductTransformer());

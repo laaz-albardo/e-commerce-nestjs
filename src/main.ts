@@ -24,7 +24,7 @@ async function bootstrap() {
 
   // Cors
   app.enableCors({
-    origin: '*',
+    origin: ['http://localhost:3000', 'https://parrella.vercel.app'],
     credentials: true,
   });
 
@@ -56,7 +56,7 @@ async function bootstrap() {
 
   await app.listen(process.env.SERVER_PORT, '0.0.0.0');
   Logger.log(
-    `Welcome to ${process.env.PRODUCT_NAME}, Server run on http://127.0.0.1:${process.env.SERVER_PORT}/api`,
+    `Welcome to ${process.env.PRODUCT_NAME}, Server run on ${process.env.SERVER_HOST}:${process.env.SERVER_PORT}/api`,
   );
 }
 bootstrap();

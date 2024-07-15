@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ICategory } from '../interfaces';
 import { FileSchema, IFile } from '@src/modules/file';
+import paginate from 'mongoose-paginate-v2';
 
 @Schema({ timestamps: true })
 export class Category implements ICategory {
@@ -18,3 +19,5 @@ export class Category implements ICategory {
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
+
+CategorySchema.plugin(paginate);

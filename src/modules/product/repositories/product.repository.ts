@@ -3,12 +3,16 @@ import { BaseMongoDbRepository } from '@src/shared';
 import { InjectModel } from '@nestjs/mongoose';
 import { ProductDocument } from '../types';
 import { Product } from '../schemas';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, PaginateModel, PaginateOptions } from 'mongoose';
 import { IProduct } from '../interfaces';
 
 @Injectable()
 export class ProductRepository extends BaseMongoDbRepository<ProductDocument> {
-  constructor(@InjectModel(Product.name) repository: Model<ProductDocument>) {
+  constructor(
+    @InjectModel(Product.name) repository: Model<ProductDocument>,
+    @InjectModel(Product.name)
+    private readonly paginateRepository: PaginateModel<ProductDocument>,
+  ) {
     super(Product.name, repository);
   }
 
@@ -24,12 +28,19 @@ export class ProductRepository extends BaseMongoDbRepository<ProductDocument> {
     orderByName?: number,
     orderByPrice?: number,
     orderByCreatedAt?: number,
-  ): Promise<ProductDocument[]> {
-    const query = this.repository;
-
-    const filter = {};
+    pagination?: boolean,
+    page?: number,
+    limit?: number,
+  ): Promise<ProductDocument[] | any> {
+    const filter: FilterQuery<ProductDocument> = {};
 
     const sortFilter = {};
+
+    const pageFilter: PaginateOptions = {
+      page: page ?? 1,
+      limit: limit ?? 10,
+      populate: 'category',
+    };
 
     if (name) {
       filter['name'] = { $regex: '.*' + name + '.*' };
@@ -61,7 +72,11 @@ export class ProductRepository extends BaseMongoDbRepository<ProductDocument> {
 
     sortFilter['createdAt'] = orderByCreatedAt ?? -1;
 
-    return await query
+    if (pagination) {
+      return await this.paginateRepository.paginate(filter, pageFilter);
+    }
+
+    return await this.repository
       .find(filter)
       .sort(sortFilter)
       .populate('category')

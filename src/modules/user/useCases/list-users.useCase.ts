@@ -9,11 +9,15 @@ export class ListUsersUseCase {
 
   constructor(private readonly repository: UserRepository) {}
 
-  async listUsers(): Promise<User[]> {
+  async listUsers(
+    pagination?: boolean,
+    page?: number,
+    limit?: number,
+  ): Promise<User[]> {
     try {
       this.logger.log('list users...');
 
-      const users = await this.repository.findAll();
+      const users = await this.repository.findAll(pagination, page, limit);
 
       this.logger.log('users listed successfully');
 

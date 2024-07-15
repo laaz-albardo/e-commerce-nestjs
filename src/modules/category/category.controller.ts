@@ -10,6 +10,9 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  Query,
+  ParseBoolPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
@@ -35,8 +38,13 @@ export class CategoryController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAll() {
-    return this.categoryService.findAll();
+  findAll(
+    @Query('pagination', new ParseBoolPipe({ optional: true }))
+    pagination?: boolean,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
+  ) {
+    return this.categoryService.findAll(pagination, page, limit);
   }
 
   @Get(':id')

@@ -4,8 +4,11 @@ export abstract class Transformer {
   async handle(data: any): Promise<any> {
     let result: any[] | any = [];
 
-    if (typeof data[Symbol.iterator] === 'function') {
-      for await (const element of data) {
+    if (
+      typeof data[Symbol.iterator] === 'function' ||
+      (data?.docs && typeof data.docs[Symbol.iterator] === 'function')
+    ) {
+      for await (const element of data?.docs || data) {
         result.push(await this.transform(element));
       }
     } else {
